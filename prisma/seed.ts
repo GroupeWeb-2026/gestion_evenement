@@ -4,102 +4,204 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Création des catégories
-  const categories = [
-    { name: "Conférence", slug: "conference" },
-    { name: "Concert", slug: "concert" },
-    { name: "Atelier", slug: "atelier" },
-    { name: "Festival", slug: "festival" },
-  ];
+  console.log("🌱 Seed des données EventSync...");
 
-  for (const c of categories) {
-    await prisma.category.upsert({
-      where: { slug: c.slug },
-      update: {},
-      create: c,
-    });
-  }
-
-  // Création de l'organisateur
-  const password = await bcrypt.hash("password123", 10);
-  const organizer = await prisma.user.upsert({
-    where: { email: "organizer@eventhub.mg" },
+  // 1. Créer l'admin
+  const adminPassword = await bcrypt.hash("admin123", 10);
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@eventsync.com" },
     update: {},
     create: {
-      email: "organizer@eventhub.mg",
-      name: "Organisateur Demo",
-      password,
-      role: "ORGANIZER",
+      email: "admin@eventsync.com",
+      name: "Administrateur",
+      password: adminPassword,
+      role: "ADMIN",
     },
   });
+  console.log("✅ Admin créé");
 
-  // Récupération des catégories
-  const conf = await prisma.category.findUnique({ where: { slug: "conference" } });
-  const concert = await prisma.category.findUnique({ where: { slug: "concert" } });
-  const atelier = await prisma.category.findUnique({ where: { slug: "atelier" } });
-  const festival = await prisma.category.findUnique({ where: { slug: "festival" } });
+  // 2. Créer les salles (rooms)
+  const rooms = [
+    { name: "Grande Salle" },
+    { name: "Salle B" },
+    { name: "Amphi C" },
+  ];
 
-  // Création des événements
-  const events = [
+  for (const room of rooms) {
+    await prisma.room.upsert({
+      where: { name: room.name },
+      update: {},
+      create: room,
+    });
+  }
+  console.log("✅ Salles créées");
+
+  // 3. Récupérer les salles
+  const grandeSalle = await prisma.room.findUnique({ where: { name: "Grande Salle" } });
+  const salleB = await prisma.room.findUnique({ where: { name: "Salle B" } });
+  const amphiC = await prisma.room.findUnique({ where: { name: "Amphi C" } });
+
+  // 4. Créer un événement
+  const event = await prisma.event.create({
+    data: {
+      title: "DevCon 2026 - Madagascar",
+      description: "La plus grande conférence tech de Madagascar. Deux jours de sessions, workshops et networking.",
+      dateStart: new Date("2026-05-15T09:00:00Z"),
+      dateEnd: new Date("2026-05-16T18:00:00Z"),
+      organizerId: admin.id,
+    },
+  });
+  console.log("✅ Événement créé");
+
+  // 5. Créer les speakers
+  const speakers = [
     {
-      title: "Conférence Tech & Innovation",
-      description: "Une journée dédiée aux dernières innovations technologiques.",
-      imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
-      location: "Ivandry",
-      city: "Antananarivo",
-      date: new Date("2026-05-12T09:00:00Z"),
-      price: 50000,
-      capacity: 200,
-      categoryId: conf!.id,
-      organizerId: organizer.id,
+      fullName: "Rajaona Andriamanantena",
+      photo: "https://randomuser.me/api/portraits/men/1.jpg",
+      bio: "Expert Next.js et architecte fullstack. 10 ans d'expérience.",
+      externalLinks: "https://linkedin.com/in/rajaona",
     },
     {
-      title: "Concert Live - Ny Hira",
-      description: "Soirée musicale exceptionnelle avec les meilleurs artistes.",
-      imageUrl: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800",
-      location: "Stade Barea",
-      city: "Antananarivo",
-      date: new Date("2026-06-20T19:00:00Z"),
-      price: 60000,
-      capacity: 5000,
-      categoryId: concert!.id,
-      organizerId: organizer.id,
+      fullName: "Mireille Rasoazanany",
+      photo: "https://randomuser.me/api/portraits/women/2.jpg",
+      bio: "Spécialiste PostgreSQL et optimisation de bases de données.",
+      externalLinks: "https://twitter.com/mireille",
     },
     {
-      title: "Workshop Développement Web",
-      description: "Apprenez à construire des apps modernes avec Next.js.",
-      imageUrl: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800",
-      location: "Antanimena",
-      city: "Antananarivo",
-      date: new Date("2026-07-05T10:00:00Z"),
-      price: 30000,
-      capacity: 50,
-      categoryId: atelier!.id,
-      organizerId: organizer.id,
-    },
-    {
-      title: "Festival Gastronomique",
-      description: "Découvrez la richesse culinaire malgache.",
-      imageUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800",
-      location: "Tana Waterfront",
-      city: "Antananarivo",
-      date: new Date("2026-08-16T11:00:00Z"),
-      price: 25000,
-      capacity: 1000,
-      categoryId: festival!.id,
-      organizerId: organizer.id,
+      fullName: "Hery Rakotomalala",
+      photo: "https://randomuser.me/api/portraits/men/3.jpg",
+      bio: "Leader technique chez TechMada, passionné de Prisma et GraphQL.",
+      externalLinks: "https://github.com/heryrak",
     },
   ];
 
-  for (const e of events) {
-    await prisma.event.upsert({
-      where: { id: e.title }, // petit hack, normalement il faudrait un vrai ID
-      update: {},
-      create: e,
+  for (const speaker of speakers) {
+    await prisma.speaker.create({
+      data: speaker,
     });
   }
+  console.log("✅ Speakers créés");
 
-  console.log("✅ Base de données initialisée avec succès !");
+  // 6. Récupérer les speakers
+  const rajaona = await prisma.speaker.findFirst({ where: { fullName: "Rajaona Andriamanantena" } });
+  const mireille = await prisma.speaker.findFirst({ where: { fullName: "Mireille Rasoazanany" } });
+  const hery = await prisma.speaker.findFirst({ where: { fullName: "Hery Rakotomalala" } });
+
+  // 7. Créer les sessions (dont une en cours pour tester le LIVE)
+  const now = new Date();
+  const liveStart = new Date(now);
+  liveStart.setHours(now.getHours() - 1); // commencé il y a 1h
+  const liveEnd = new Date(now);
+  liveEnd.setHours(now.getHours() + 1); // fin dans 1h
+
+  const sessions = [
+    {
+      title: "Next.js 15 et Server Components",
+      description: "Découvrez les nouveautés de Next.js 15 et comment optimiser vos apps.",
+      startTime: liveStart, // SESSION LIVE !
+      endTime: liveEnd,
+      capacity: 100,
+      eventId: event.id,
+      roomId: grandeSalle!.id,
+    },
+    {
+      title: "Prisma ORM - Bonnes pratiques",
+      description: "Apprenez à modéliser vos données et optimiser vos requêtes.",
+      startTime: new Date("2026-05-15T11:00:00Z"),
+      endTime: new Date("2026-05-15T12:30:00Z"),
+      capacity: 80,
+      eventId: event.id,
+      roomId: salleB!.id,
+    },
+    {
+      title: "PostgreSQL Advanced",
+      description: "Indexing, partitioning et optimisation de requêtes.",
+      startTime: new Date("2026-05-15T14:00:00Z"),
+      endTime: new Date("2026-05-15T16:00:00Z"),
+      capacity: 50,
+      eventId: event.id,
+      roomId: amphiC!.id,
+    },
+    {
+      title: "Fullstack avec Next.js et Prisma",
+      description: "Construisez une app complète de A à Z.",
+      startTime: new Date("2026-05-16T10:00:00Z"),
+      endTime: new Date("2026-05-16T12:00:00Z"),
+      capacity: 120,
+      eventId: event.id,
+      roomId: grandeSalle!.id,
+    },
+  ];
+
+  for (const session of sessions) {
+    await prisma.session.create({
+      data: session,
+    });
+  }
+  console.log("✅ Sessions créées");
+
+  // 8. Associer les speakers aux sessions
+  const sessionList = await prisma.session.findMany();
+
+  // Session 1 (Next.js) -> Rajaona + Hery
+  await prisma.sessionSpeaker.createMany({
+    data: [
+      { sessionId: sessionList[0].id, speakerId: rajaona!.id },
+      { sessionId: sessionList[0].id, speakerId: hery!.id },
+    ],
+  });
+
+  // Session 2 (Prisma) -> Mireille + Hery
+  await prisma.sessionSpeaker.createMany({
+    data: [
+      { sessionId: sessionList[1].id, speakerId: mireille!.id },
+      { sessionId: sessionList[1].id, speakerId: hery!.id },
+    ],
+  });
+
+  // Session 3 (PostgreSQL) -> Mireille
+  await prisma.sessionSpeaker.create({
+    data: { sessionId: sessionList[2].id, speakerId: mireille!.id },
+  });
+
+  // Session 4 (Fullstack) -> Rajaona + Hery
+  await prisma.sessionSpeaker.createMany({
+    data: [
+      { sessionId: sessionList[3].id, speakerId: rajaona!.id },
+      { sessionId: sessionList[3].id, speakerId: hery!.id },
+    ],
+  });
+
+  console.log("✅ Speakers associés aux sessions");
+
+  // 9. Ajouter quelques questions de test sur la session LIVE
+  await prisma.question.createMany({
+    data: [
+      {
+        content: "Est-ce que Next.js 15 supporte React 19 ?",
+        authorName: "Andry",
+        upvotes: 5,
+        sessionId: sessionList[0].id,
+      },
+      {
+        content: "Quelle est la différence entre Server Actions et API Routes ?",
+        authorName: null, // anonyme
+        upvotes: 3,
+        sessionId: sessionList[0].id,
+      },
+      {
+        content: "Prisma sera-t-il compatible avec Drizzle ?",
+        authorName: "Tiana",
+        upvotes: 2,
+        sessionId: sessionList[0].id,
+      },
+    ],
+  });
+  console.log("✅ Questions de test ajoutées");
+
+  console.log("\n🎉 Seed terminé avec succès !");
+  console.log("📧 Admin: admin@eventsync.com | Mot de passe: admin123");
+  console.log("🔴 Une session LIVE est disponible (Next.js 15)");
 }
 
 main()

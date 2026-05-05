@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "EventHub — Découvrez et réservez vos événements",
@@ -12,8 +13,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" data-theme="light">
       <body className="min-h-screen antialiased">
-        {children}
-        <Toaster richColors position="top-right" />
+        <Providers>
+          {children}
+          <Toaster richColors position="top-right" />
+        </Providers>
       </body>
     </html>
   );

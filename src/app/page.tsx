@@ -1,122 +1,46 @@
 import Link from "next/link";
-import { Navbar } from "@/components/Navbar";
-import { Hero } from "@/components/Hero";
-import { EventCard, type EventCardData } from "@/components/EventCard";
-import { Filters } from "@/components/Filters";
-import { FeatureBar } from "@/components/FeatureBar";
-import { Footer } from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
-
-const FALLBACK: EventCardData[] = [
-  {
-    id: "1",
-    title: "Conférence Tech & Innovation",
-    imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
-    location: "Ivandry",
-    city: "Antananarivo",
-    dateLabel: "12 MAI 2026",
-    category: "Conférence",
-    categoryColor: "#7c3aed",
-    price: 50000,
-  },
-  {
-    id: "2",
-    title: "Concert Live - Ny Hira",
-    imageUrl: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800",
-    location: "Stade Barea",
-    city: "Antananarivo",
-    dateLabel: "20 JUIN 2026",
-    category: "Concert",
-    categoryColor: "#ef4444",
-    price: 60000,
-  },
-  {
-    id: "3",
-    title: "Workshop Développement Web",
-    imageUrl: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800",
-    location: "Antanimena",
-    city: "Antananarivo",
-    dateLabel: "05 JUIL. 2026",
-    category: "Atelier",
-    categoryColor: "#10b981",
-    price: 30000,
-  },
-  {
-    id: "4",
-    title: "Festival Gastronomique",
-    imageUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800",
-    location: "Tana Waterfront",
-    city: "Antananarivo",
-    dateLabel: "16 AOÛT 2026",
-    category: "Festival",
-    categoryColor: "#f59e0b",
-    price: 25000,
-  },
-];
-
-const CATEGORY_COLORS: Record<string, string> = {
-  Conférence: "#7c3aed",
-  Concert: "#ef4444",
-  Atelier: "#10b981",
-  Festival: "#f59e0b",
-};
-
-async function getEvents(): Promise<EventCardData[]> {
-  try {
-    const events = await prisma.event.findMany({
-      take: 8,
-      orderBy: { date: "asc" },
-      include: { category: true },
-    });
-    if (!events.length) return FALLBACK;
-    return events.map((e) => ({
-      id: e.id,
-      title: e.title,
-      imageUrl: e.imageUrl ?? "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
-      location: e.location,
-      city: e.city,
-      dateLabel: new Date(e.date)
-        .toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })
-        .toUpperCase(),
-      category: e.category.name,
-      categoryColor: CATEGORY_COLORS[e.category.name] ?? "#7c3aed",
-      price: e.price,
-    }));
-  } catch {
-    return FALLBACK;
-  }
-}
+import { Calendar, Users } from "lucide-react";
 
 export default async function HomePage() {
-  const events = await getEvents();
+  const events = await prisma.event.findMany({
+    include: { sessions: true },
+    orderBy: { dateStart: "asc" },
+  });
+
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      <Hero />
+    <div className="min-h-screen bg-gray-50">
+      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">EventSync</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">Plateforme de gestion d'événements et questions en direct</p>
+        </div>
 
-      <main className="mx-auto mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
-          <section>
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Événements recommandés</h2>
-              <Link href="/events" className="text-sm font-medium text-brand-600 hover:underline">
-                Voir tout
-              </Link>
-            </div>
+        {events.length === 0 && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-800 text-center">
+            Aucun événement trouvé. Exécutez <code className="bg-yellow-100 px-2 py-1 rounded">npx prisma db seed</code>
+          </div>
+        )}
 
-            <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              {events.slice(0, 4).map((e) => (
-                <EventCard key={e.id} event={e} />
-              ))}
-            </div>
-          </section>
-
-          <Filters />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {events.map((event) => (
+            <Link key={event.id} href={`/events/${event.id}`}>
+              <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all p-5 border border-gray-100">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">{event.title}</h2>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">{event.description}</p>
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>{new Date(event.dateStart).toLocaleDateString("fr-FR")} - {new Date(event.dateEnd).toLocaleDateString("fr-FR")}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Users className="h-4 w-4" />
+                  <span>{event.sessions.length} sessions</span>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       </main>
-
-      <FeatureBar />
-      <Footer />
     </div>
   );
 }
