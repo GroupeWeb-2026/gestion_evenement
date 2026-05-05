@@ -95,9 +95,22 @@ export default async function HomePage() {
               </h2>
               <Link
                 href="/events"
-                className="text-sm font-medium text-brand-600 hover:underline"
+                className="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors inline-flex items-center gap-1 group"
               >
                 Voir tout
+                <svg
+                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </Link>
             </div>
 

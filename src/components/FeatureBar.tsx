@@ -10,7 +10,7 @@ const items = [
 export function FeatureBar() {
   return (
     <section className="mx-auto mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 gap-4 rounded-2xl bg-brand-50/70 p-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 rounded-2xl bg-brand-100 p-6 sm:grid-cols-2 lg:grid-cols-4">
         {items.map(({ icon: Icon, title, text }) => (
           <div key={title} className="flex items-start gap-3">
             <div className="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-white text-brand-600 shadow-sm">

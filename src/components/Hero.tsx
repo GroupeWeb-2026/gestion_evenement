@@ -9,16 +9,16 @@ export function Hero() {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage:
-            "linear-gradient(120deg, rgba(124,58,237,0.85) 0%, rgba(124,58,237,0.55) 45%, rgba(124,58,237,0.25) 100%), url('https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=1600')",
+            "linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 38%, rgba(255,255,255,0.1) 60%), url('https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=1600')",
         }}
       />
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-24">
-        <div className="text-white">
-          <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl">
+        <div className="text-gray-800">
+          <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl text-gray-800">
             Découvrez des événements
             <br /> et participez en direct
           </h1>
-          <p className="mt-4 max-w-md text-base text-white/85">
+          <p className="mt-4 max-w-md text-base text-gray-800">
             Conférences, ateliers, concerts. Posez vos questions et interagissez avec les intervenants.
           </p>
           <Link
