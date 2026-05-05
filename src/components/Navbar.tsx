@@ -150,7 +150,7 @@ export function Navbar() {
                 className="btn btn-ghost btn-sm"
                 aria-label="Déconnexion"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-4 w-4 text-red-600" />
               </button>
             </>
           ) : (
