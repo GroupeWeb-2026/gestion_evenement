@@ -68,11 +68,11 @@ export function Navbar() {
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Rechercher un évenement.."
-            className="input input-bordered h-10 w-full rounded-full border-gray-200 bg-gray-50 pl-6 pr-14 text-sm focus:bg-white"
+            placeholder="Rechercher un évenement..."
+            className="input input-bordered h-10 w-full rounded-full border-violet-600 bg-mauve-100 text-black pl-6 pr-14 text-sm focus:bg-white focus:outline-none focus:ring-0 focus:border-violet-600"
           />
           <button className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-600 transition">
-            <Search className="h-4 w-4" />
+            <Search className="h-4 w-4 text-black" />
           </button>
         </div>
 

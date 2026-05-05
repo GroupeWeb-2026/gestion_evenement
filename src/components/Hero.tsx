@@ -13,19 +13,21 @@ export function Hero() {
         }}
       />
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-24">
-        <div className="text-gray-800">
-          <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl text-gray-800">
+        <div className="text-black">
+          <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl text-black">
             Découvrez des événements
             <br /> et participez en direct
           </h1>
-          <p className="mt-4 max-w-md text-base text-gray-800">
-            Conférences, ateliers, concerts. Posez vos questions et interagissez avec les intervenants.
+          <p className="mt-4 max-w-md text-base text-black">
+            Conférences, ateliers, concerts. Posez vos questions et interagissez
+            avec les intervenants.
           </p>
           <Link
             href="/events"
-            className="btn mt-8 inline-flex items-center gap-2 rounded-full border-0 bg-brand-600 px-6 text-white shadow-lg shadow-brand-600/40 hover:bg-brand-700"
+            className="btn mt-8 inline-flex items-center justify-center gap-2 rounded-full border-0 bg-brand-600 px-6 py-2.5 text-white shadow-lg shadow-brand-600/40 hover:bg-brand-700 group transition-colors"
           >
-            Explorer les événements <ArrowRight className="h-4 w-4" />
+            <span className="leading-none">Explorer les événements</span>
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 
