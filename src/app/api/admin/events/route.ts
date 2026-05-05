@@ -2,31 +2,47 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { z } from "zod";
-
-const eventSchema = z.object({
-  title: z.string().min(3),
-  description: z.string().optional(),
-  dateStart: z.string().datetime(),
-  dateEnd: z.string().datetime(),
-});
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  
+  if (!session) {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+  
+  if (session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+  }
+
   try {
-    const body = await request.json();
-    const validated = eventSchema.parse(body);
+    const { title, description, dateStart, dateEnd } = await request.json();
+    
+    // Validation simple
+    if (!title || !dateStart || !dateEnd) {
+      return NextResponse.json({ error: "Champs manquants" }, { status: 400 });
+    }
+    
     const event = await prisma.event.create({
-      data: { ...validated, dateStart: new Date(validated.dateStart), dateEnd: new Date(validated.dateEnd), organizerId: session.user.id },
+      data: {
+        title,
+        description: description || "",
+        dateStart: new Date(dateStart),
+        dateEnd: new Date(dateEnd),
+        organizerId: session.user.id,
+      },
     });
-    return NextResponse.json(event);
+    
+    return NextResponse.json(event, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: "Erreur" }, { status: 500 });
+    console.error("Erreur:", error);
+    return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
   }
 }
 
 export async function GET() {
-  const events = await prisma.event.findMany({ include: { sessions: true }, orderBy: { dateStart: "asc" } });
+  const events = await prisma.event.findMany({
+    include: { sessions: true },
+    orderBy: { dateStart: "desc" },
+  });
   return NextResponse.json(events);
 }

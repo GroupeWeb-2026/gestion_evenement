@@ -24,7 +24,7 @@ function getSessionStatus(startTime: string, endTime: string): { label: string; 
   if (now >= start && now <= end) {
     return { label: "LIVE", color: "bg-red-800 text-white" };
   } else if (now < start) {
-    return { label: "En cours", color: "bg-green-800 text-white"};
+    return { label: "A venir", color: "bg-blue-800 text-white"};
   } else {
     return { label: "Terminée", color: "bg-gray-800 text-white"};
   }

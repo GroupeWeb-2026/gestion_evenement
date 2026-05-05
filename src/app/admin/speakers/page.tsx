@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Trash2, Plus, RotateCcw } from "lucide-react";
+import { StopCircle, Plus, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 interface Speaker {
@@ -99,7 +99,7 @@ export default function AdminSpeakersPage() {
                       </button>
                     ) : (
                       <button onClick={() => deleteSpeaker(speaker.id)} className="text-red-600 hover:text-red-800" title="Retirer">
-                        <Trash2 className="h-4 w-4" />
+                        <StopCircle className="h-4 w-4" />
                       </button>
                     )}
                   </td>
