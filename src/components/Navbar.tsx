@@ -35,7 +35,11 @@ export function Navbar() {
     if (pathname === "/") activeRef = homeRef.current;
     else if (pathname === "/events") activeRef = eventsRef.current;
     else if (pathname === "/favorites") activeRef = favoritesRef.current;
-    else if (showAdminUI && (pathname === "/admin" || pathname.startsWith("/admin/"))) activeRef = adminRef.current;
+    else if (
+      showAdminUI &&
+      (pathname === "/admin" || pathname.startsWith("/admin/"))
+    )
+      activeRef = adminRef.current;
 
     if (activeRef) {
       const { offsetLeft, offsetWidth } = activeRef;
@@ -44,7 +48,12 @@ export function Navbar() {
   }, [pathname, showAdminUI]);
 
   const initials = session?.user?.name
-    ? session.user.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
+    ? session.user.name
+        .split(" ")
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
     : "?";
 
   return (
@@ -54,14 +63,17 @@ export function Navbar() {
           EventSync
         </Link>
 
-        {/* Barre de recherche */}
+        {/* Barre de recherche avec icône loupe à droite */}
         <div className="relative hidden flex-1 max-w-md md:block">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Rechercher un événement"
-            className="input input-bordered h-10 w-full rounded-full border-gray-200 bg-gray-50 pl-9 text-sm focus:bg-white"
+            placeholder="Rechercher un évenement.."
+            className="input input-bordered h-10 w-full rounded-full border-gray-200 bg-gray-50 pl-6 pr-14 text-sm focus:bg-white"
           />
+          <button className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-600 transition">
+            <Search className="h-4 w-4" />
+          </button>
         </div>
 
         {/* Navigation links avec tiret glissant */}
@@ -70,7 +82,9 @@ export function Navbar() {
             ref={homeRef}
             href="/"
             className={`relative text-sm font-medium transition-colors px-4 py-6 -my-4 ${
-              pathname === "/" ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
+              pathname === "/"
+                ? "text-brand-600"
+                : "text-gray-700 hover:text-brand-600"
             }`}
           >
             Accueil
@@ -79,7 +93,9 @@ export function Navbar() {
             ref={eventsRef}
             href="/events"
             className={`relative text-sm font-medium transition-colors px-4 py-6 -my-4 ${
-              pathname === "/events" ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
+              pathname === "/events"
+                ? "text-brand-600"
+                : "text-gray-700 hover:text-brand-600"
             }`}
           >
             Événements
@@ -88,7 +104,9 @@ export function Navbar() {
             ref={favoritesRef}
             href="/favorites"
             className={`relative text-sm font-medium transition-colors px-4 py-6 -my-4 ${
-              pathname === "/favorites" ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
+              pathname === "/favorites"
+                ? "text-brand-600"
+                : "text-gray-700 hover:text-brand-600"
             }`}
           >
             Favoris
@@ -98,7 +116,9 @@ export function Navbar() {
               ref={adminRef}
               href="/admin"
               className={`relative text-sm font-medium transition-colors px-4 py-6 -my-4 ${
-                isAdminActive ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
+                isAdminActive
+                  ? "text-brand-600"
+                  : "text-gray-700 hover:text-brand-600"
               }`}
             >
               Admin
@@ -134,7 +154,10 @@ export function Navbar() {
               </button>
             </>
           ) : (
-            <Link href="/login" className="btn btn-sm border-0 bg-brand-600 text-white hover:bg-brand-700">
+            <Link
+              href="/login"
+              className="btn btn-sm border-0 bg-brand-600 text-white hover:bg-brand-700"
+            >
               Connexion
             </Link>
           )}

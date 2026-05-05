@@ -37,11 +37,16 @@ async function getEvents(): Promise<EventCardData[]> {
     return events.map((e) => ({
       id: e.id,
       title: e.title,
-      imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
+      imageUrl:
+        "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
       location: "Ivandry",
       city: "Antananarivo",
       dateLabel: new Date(e.dateStart)
-        .toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })
+        .toLocaleDateString("fr-FR", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
         .toUpperCase(),
       category: "Conférence",
       categoryColor: CATEGORY_COLORS["Conférence"] ?? "#7c3aed",
@@ -55,13 +60,17 @@ async function getEvents(): Promise<EventCardData[]> {
 function CreateEventCard() {
   return (
     <Link href="/admin/events/new">
-      <div className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition hover:shadow-lg cursor-pointer h-full flex flex-col items-center justify-center min-h-[280px]">
+      <div className="group overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm ring-1 ring-gray-200 transition hover:shadow-lg cursor-pointer h-full flex flex-col items-center justify-center min-h-[280px] hover:bg-white/90">
         <div className="flex flex-col items-center justify-center gap-3 p-6">
-          <div className="rounded-full bg-brand-50 p-4 group-hover:bg-brand-100 transition">
+          <div className="rounded-full bg-brand-100 p-4 group-hover:bg-brand-200 transition">
             <Plus className="h-8 w-8 text-brand-600" />
           </div>
-          <p className="text-sm font-medium text-gray-600">Créer un événement</p>
-          <p className="text-xs text-gray-400 text-center">Ajoutez un nouvel événement</p>
+          <p className="text-sm font-medium text-gray-700">
+            Créer un événement
+          </p>
+          <p className="text-xs text-gray-500 text-center">
+            Ajoutez un nouvel événement
+          </p>
         </div>
       </div>
     </Link>
@@ -81,8 +90,13 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
           <section>
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Événements recommandés</h2>
-              <Link href="/events" className="text-sm font-medium text-brand-600 hover:underline">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Événements recommandés
+              </h2>
+              <Link
+                href="/events"
+                className="text-sm font-medium text-brand-600 hover:underline"
+              >
                 Voir tout
               </Link>
             </div>
