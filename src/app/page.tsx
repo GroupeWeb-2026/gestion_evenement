@@ -18,6 +18,9 @@ export type EventCardData = {
   category: string;
   categoryColor?: string;
   initialLiked?: boolean;
+  startTime?: Date;
+  endTime?: Date;
+  messageCount?: number;
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -32,13 +35,21 @@ async function getEvents(): Promise<EventCardData[]> {
     const events = await prisma.event.findMany({
       take: 4,
       orderBy: { dateStart: "asc" },
+      include: {
+        sessions: {
+          include: {
+            questions: true,
+          },
+          take: 1,
+          orderBy: { startTime: "asc" },
+        },
+      },
     });
     if (!events.length) return [];
     return events.map((e) => ({
       id: e.id,
       title: e.title,
-      imageUrl:
-        "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
+      imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
       location: "Ivandry",
       city: "Antananarivo",
       dateLabel: new Date(e.dateStart)
@@ -50,6 +61,9 @@ async function getEvents(): Promise<EventCardData[]> {
         .toUpperCase(),
       category: "Conférence",
       categoryColor: CATEGORY_COLORS["Conférence"] ?? "#7c3aed",
+      startTime: e.sessions[0]?.startTime,
+      endTime: e.sessions[0]?.endTime,
+      messageCount: e.sessions[0]?.questions.length || 0,
     }));
   } catch (error) {
     console.error("Erreur getEvents:", error);
@@ -114,7 +128,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 2xl:gap-8">
               {events.map((e) => (
                 <EventCard key={e.id} event={e} />
               ))}

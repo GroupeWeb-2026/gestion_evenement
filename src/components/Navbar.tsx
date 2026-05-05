@@ -21,6 +21,14 @@ export function Navbar() {
   const showAdminUI = isLoggedIn && !isLoginPage;
   const isAdminActive = pathname === "/admin" || pathname.startsWith("/admin/");
 
+  // 🔥 NOUVELLE LOGIQUE : Fonction pour déterminer si un lien est actif
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    if (href === "/events") return pathname === "/events" || pathname.startsWith("/events/");
+    if (href === "/favorites") return pathname === "/favorites";
+    return false;
+  };
+
   // Ref pour chaque élément de navigation
   const homeRef = useRef<HTMLAnchorElement>(null);
   const eventsRef = useRef<HTMLAnchorElement>(null);
@@ -32,20 +40,16 @@ export function Navbar() {
 
   useEffect(() => {
     let activeRef = null;
-    if (pathname === "/") activeRef = homeRef.current;
-    else if (pathname === "/events") activeRef = eventsRef.current;
-    else if (pathname === "/favorites") activeRef = favoritesRef.current;
-    else if (
-      showAdminUI &&
-      (pathname === "/admin" || pathname.startsWith("/admin/"))
-    )
-      activeRef = adminRef.current;
+    if (isActive("/")) activeRef = homeRef.current;
+    else if (isActive("/events")) activeRef = eventsRef.current;
+    else if (isActive("/favorites")) activeRef = favoritesRef.current;
+    else if (showAdminUI && isAdminActive) activeRef = adminRef.current;
 
     if (activeRef) {
       const { offsetLeft, offsetWidth } = activeRef;
       setUnderlineStyle({ left: offsetLeft, width: offsetWidth });
     }
-  }, [pathname, showAdminUI]);
+  }, [pathname, showAdminUI, isAdminActive]);
 
   const initials = session?.user?.name
     ? session.user.name
@@ -82,9 +86,7 @@ export function Navbar() {
             ref={homeRef}
             href="/"
             className={`relative text-sm font-medium transition-colors px-4 py-6 -my-4 ${
-              pathname === "/"
-                ? "text-brand-600"
-                : "text-gray-700 hover:text-brand-600"
+              isActive("/") ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
             }`}
           >
             Accueil
@@ -93,9 +95,7 @@ export function Navbar() {
             ref={eventsRef}
             href="/events"
             className={`relative text-sm font-medium transition-colors px-4 py-6 -my-4 ${
-              pathname === "/events"
-                ? "text-brand-600"
-                : "text-gray-700 hover:text-brand-600"
+              isActive("/events") ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
             }`}
           >
             Événements
@@ -104,9 +104,7 @@ export function Navbar() {
             ref={favoritesRef}
             href="/favorites"
             className={`relative text-sm font-medium transition-colors px-4 py-6 -my-4 ${
-              pathname === "/favorites"
-                ? "text-brand-600"
-                : "text-gray-700 hover:text-brand-600"
+              isActive("/favorites") ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
             }`}
           >
             Favoris
@@ -116,9 +114,7 @@ export function Navbar() {
               ref={adminRef}
               href="/admin"
               className={`relative text-sm font-medium transition-colors px-4 py-6 -my-4 ${
-                isAdminActive
-                  ? "text-brand-600"
-                  : "text-gray-700 hover:text-brand-600"
+                isAdminActive ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
               }`}
             >
               Admin
