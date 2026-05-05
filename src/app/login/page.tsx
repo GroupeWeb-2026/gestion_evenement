@@ -10,7 +10,7 @@ import Link from "next/link";
 export default function LoginPage() {
   const router = useRouter();
   const params = useSearchParams();
-  const callbackUrl = params.get("callbackUrl") || "/admin";
+  const callbackUrl = params.get("callbackUrl") || "/";  // ← Redirige vers l'accueil
   const [email, setEmail] = useState("admin@eventsync.com");
   const [password, setPassword] = useState("admin123");
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ export default function LoginPage() {
       return;
     }
     toast.success("Connexion réussie");
-    router.push(callbackUrl);
+    router.push(callbackUrl);  // ← Redirige vers l'accueil
     router.refresh();
   }
 
@@ -40,9 +40,9 @@ export default function LoginPage() {
         <Link href="/" className="mb-6 flex items-center gap-2 text-brand-600">
           <span className="text-xl font-bold">EventSync</span>
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Connexion admin</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Connexion</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Connectez-vous pour gérer les événements, sessions et intervenants.
+          Connectez-vous pour accéder à l'administration.
         </p>
 
         <div className="mt-4 rounded-lg border border-brand-200 bg-brand-50 p-3 text-xs text-brand-700">
