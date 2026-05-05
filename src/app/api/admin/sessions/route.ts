@@ -8,9 +8,15 @@ export async function GET() {
   if (!session || session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
+  
   const sessions = await prisma.session.findMany({
-    include: { event: true, room: true },
+    include: { 
+      event: { select: { title: true } },
+      room: { select: { name: true } }
+    },
+    orderBy: { startTime: "desc" },
   });
+  
   return NextResponse.json(sessions);
 }
 
@@ -19,6 +25,7 @@ export async function POST(request: Request) {
   if (!session || session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
+  
   const { title, description, startTime, endTime, capacity, eventId, roomId, speakerIds } = await request.json();
   
   const newSession = await prisma.session.create({
@@ -35,5 +42,6 @@ export async function POST(request: Request) {
       },
     },
   });
+  
   return NextResponse.json(newSession);
 }

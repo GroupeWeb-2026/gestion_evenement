@@ -8,6 +8,19 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+// Fonction pour déterminer le statut d'une session
+function getSessionStatus(startTime: Date, endTime: Date): { label: string; color: string } {
+  const now = new Date();
+  
+  if (now >= startTime && now <= endTime) {
+    return { label: "LIVE", color: "bg-red-500 text-white" };
+  } else if (now < startTime) {
+    return { label: "À venir", color: "bg-blue-500 text-white" };
+  } else {
+    return { label: "Terminée", color: "bg-gray-400 text-white" };
+  }
+}
+
 export default async function EventDetailPage({ params }: PageProps) {
   const { id } = await params;
 
@@ -84,20 +97,23 @@ export default async function EventDetailPage({ params }: PageProps) {
                       {allRooms.map((room) => {
                         const session = sessions.find((s: any) => s.roomId === room.id);
                         const live = session ? isLive(session.startTime, session.endTime) : false;
+                        const status = session ? getSessionStatus(session.startTime, session.endTime) : null;
                         return (
                           <td key={room.id} className="p-4 align-top">
                             {session ? (
                               <Link href={`/sessions/${session.id}`}>
                                 <div className="group cursor-pointer">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="font-medium text-gray-900 group-hover:text-brand-600 transition">
-                                      {session.title}
-                                    </h3>
-                                    {live && (
-                                      <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full animate-pulse">
-                                        LIVE
-                                      </span>
-                                    )}
+                                  <div className="flex flex-col gap-1 mb-1">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <h3 className="font-medium text-gray-900 group-hover:text-brand-600 transition">
+                                        {session.title}
+                                      </h3>
+                                      {status && (
+                                        <span className={`${status.color} text-[10px] px-2 py-0.5 rounded-full ${status.label === "LIVE" ? "animate-pulse" : ""}`}>
+                                          {status.label}
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                   <p className="text-xs text-gray-500 line-clamp-2 mb-2">
                                     {session.description}
