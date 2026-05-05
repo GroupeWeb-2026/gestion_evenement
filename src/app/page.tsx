@@ -6,6 +6,9 @@ import { Filters } from "@/components/Filters";
 import { FeatureBar } from "@/components/FeatureBar";
 import { Footer } from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { Plus } from "lucide-react";
 
 export type EventCardData = {
   id: string;
@@ -51,9 +54,28 @@ async function getEvents(): Promise<EventCardData[]> {
   }
 }
 
+// Composant Carte "Créer un événement"
+function CreateEventCard() {
+  return (
+    <Link href="/admin/events/new">
+      <div className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition hover:shadow-lg cursor-pointer h-full flex flex-col items-center justify-center min-h-[280px]">
+        <div className="flex flex-col items-center justify-center gap-3 p-6">
+          <div className="rounded-full bg-brand-50 p-4 group-hover:bg-brand-100 transition">
+            <Plus className="h-8 w-8 text-brand-600" />
+          </div>
+          <p className="text-sm font-medium text-gray-600">Créer un événement</p>
+          <p className="text-xs text-gray-400 text-center">Ajoutez un nouvel événement</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export default async function HomePage() {
   const events = await getEvents();
-  
+  const session = await getServerSession(authOptions);
+  const isAdmin = session?.user?.role === "ADMIN";
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -73,6 +95,8 @@ export default async function HomePage() {
               {events.map((e) => (
                 <EventCard key={e.id} event={e} />
               ))}
+              {/* Afficher la carte "Créer" uniquement si admin connecté */}
+              {isAdmin && <CreateEventCard />}
             </div>
           </section>
 
