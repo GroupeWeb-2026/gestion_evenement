@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { EventCard } from "@/components/EventCard";
 import { Filters } from "@/components/Filters";
 import { FeatureBar } from "@/components/FeatureBar";
-import { Footer } from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -54,7 +52,6 @@ async function getEvents(): Promise<EventCardData[]> {
   }
 }
 
-// Composant Carte "Créer un événement"
 function CreateEventCard() {
   return (
     <Link href="/admin/events/new">
@@ -78,7 +75,6 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
       <Hero />
 
       <main className="mx-auto mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -95,7 +91,6 @@ export default async function HomePage() {
               {events.map((e) => (
                 <EventCard key={e.id} event={e} />
               ))}
-              {/* Afficher la carte "Créer" uniquement si admin connecté */}
               {isAdmin && <CreateEventCard />}
             </div>
           </section>
@@ -105,7 +100,6 @@ export default async function HomePage() {
       </main>
 
       <FeatureBar />
-      <Footer />
     </div>
   );
 }

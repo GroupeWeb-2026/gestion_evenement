@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 import { Star, Clock, MapPin } from "lucide-react";
 
 interface Session {
@@ -74,8 +73,14 @@ export default function FavoritesPage() {
                 <h2 className="text-lg font-semibold text-gray-900">{session.title}</h2>
                 <p className="text-sm text-gray-500 mt-1">{session.event.title}</p>
                 <div className="flex flex-wrap gap-4 mt-3 text-xs text-gray-500">
-                  <div className="flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(session.startTime).toLocaleDateString("fr-FR")} à {new Date(session.startTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</div>
-                  <div className="flex items-center gap-1"><MapPin className="h-3 w-3" />{session.room.name}</div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    {new Date(session.startTime).toLocaleDateString("fr-FR")} à {new Date(session.startTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {session.room.name}
+                  </div>
                 </div>
               </div>
             </Link>

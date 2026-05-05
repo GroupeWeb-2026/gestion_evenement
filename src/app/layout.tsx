@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { Providers } from "@/components/Providers";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "EventHub — Découvrez et réservez vos événements",
+  title: "EventSync — Gérez vos événements et interagissez en direct",
   description:
-    "Conférences, ateliers, concerts, festivals : trouvez et réservez votre place en quelques clics.",
+    "Planning multi-track, questions en direct, sessions favorites.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -14,7 +16,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fr" data-theme="light">
       <body className="min-h-screen antialiased">
         <Providers>
+          <Navbar />
           {children}
+          <Footer />
           <Toaster richColors position="top-right" />
         </Providers>
       </body>

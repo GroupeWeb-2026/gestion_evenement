@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, LogOut, Search } from "lucide-react";
+import { Bell, LogOut, Search, ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 
@@ -16,11 +16,9 @@ export function Navbar() {
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
   
-  // Ne pas montrer l'interface admin sur la page de login
   const isLoginPage = pathname === "/login";
-  
-  // Afficher l'interface admin si connecté ET pas sur la page de login
   const showAdminUI = isLoggedIn && !isLoginPage;
+  const isAdminActive = pathname === "/admin" || pathname.startsWith("/admin/");
 
   const initials = session?.user?.name
     ? session.user.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
@@ -44,26 +42,37 @@ export function Navbar() {
         </div>
 
         {/* Navigation links */}
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-2 md:flex">
           {links.map((l) => {
             const active = pathname === l.href;
             return (
               <Link
                 key={l.href}
                 href={l.href}
-                className={`relative text-sm font-medium transition-colors ${
+                className={`relative text-sm font-medium transition-colors px-4 py-6 -my-4 ${
                   active ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
                 }`}
               >
                 {l.label}
-                {active && <span className="absolute -bottom-5 left-0 right-0 h-0.5 rounded-full bg-brand-600" />}
+                {active && (
+                  <span className="absolute -bottom-[1px] left-4 right-4 h-0.5 bg-brand-600 rounded-full" />
+                )}
               </Link>
             );
           })}
-          {/* Lien Admin visible uniquement quand connecté (sur toutes les pages sauf login) */}
+          
+          {/* Lien Admin avec zone cliquable large */}
           {showAdminUI && (
-            <Link href="/admin" className="relative text-sm font-medium text-gray-700 hover:text-brand-600 transition">
+            <Link
+              href="/admin"
+              className={`relative text-sm font-medium transition-colors px-4 py-6 -my-4 ${
+                isAdminActive ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
+              }`}
+            >
               Admin
+              {isAdminActive && (
+                <span className="absolute -bottom-[1px] left-4 right-4 h-0.5 bg-brand-600 rounded-full" />
+              )}
             </Link>
           )}
         </nav>
@@ -74,15 +83,12 @@ export function Navbar() {
           </button>
 
           {showAdminUI ? (
-            // Interface connecté : nom + déconnexion
             <>
               <div className="flex items-center gap-1.5 rounded-full bg-gray-100 py-1 pl-1 pr-2">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
                   {initials}
                 </div>
-                <span className="hidden text-xs font-medium text-gray-700 sm:inline">
-                  {session.user.name}
-                </span>
+                <ChevronDown className="h-4 w-4 text-gray-500" />
               </div>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
@@ -93,7 +99,6 @@ export function Navbar() {
               </button>
             </>
           ) : (
-            // Bouton Connexion (visible sur toutes les pages quand non connecté)
             <Link href="/login" className="btn btn-sm border-0 bg-brand-600 text-white hover:bg-brand-700">
               Connexion
             </Link>
