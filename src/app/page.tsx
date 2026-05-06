@@ -74,16 +74,16 @@ async function getEvents(): Promise<EventCardData[]> {
 function CreateEventCard() {
   return (
     <Link href="/admin/events/new">
-      <div className="group overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm ring-1 ring-gray-200 transition hover:shadow-lg cursor-pointer h-full flex flex-col items-center justify-center min-h-[280px] hover:bg-white/90">
+      <div className="group overflow-hidden cursor-default rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm ring-1 ring-gray-200 transition hover:shadow-lg cursor-pointer h-full flex flex-col items-center justify-center min-h-[280px] hover:bg-white/90">
         <div className="flex flex-col items-center justify-center gap-3 p-6">
           <div className="rounded-full bg-brand-100 p-4 group-hover:bg-brand-200 transition">
             <Plus className="h-8 w-8 text-brand-600" />
           </div>
           <p className="text-sm font-medium text-gray-700">
-            Créer un événement
+            Créer un évenement
           </p>
           <p className="text-xs text-gray-500 text-center">
-            Ajoutez un nouvel événement
+            Ajoutez un nouvel évenement
           </p>
         </div>
       </div>
@@ -105,7 +105,7 @@ export default async function HomePage() {
           <section>
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
-                Événements recommandés
+                Évenements recommandés
               </h2>
               <Link
                 href="/events"

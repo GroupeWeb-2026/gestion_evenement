@@ -9,13 +9,13 @@ export default async function AdminPage() {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") redirect("/login");
 
-  // Compter uniquement les événements
+  // Compte uniquement les événements
   const eventsCount = await prisma.event.count();
   
-  // Compter toutes les sessions
+  // Compte toutes les sessions
   const sessionsCount = await prisma.session.count();
   
-  // Compter uniquement les speakers actifs (non retirés)
+  // Compte uniquement les speakers actifs (non retirés)
   const speakersCount = await prisma.speaker.count({
     where: { isDeleted: false }
   });

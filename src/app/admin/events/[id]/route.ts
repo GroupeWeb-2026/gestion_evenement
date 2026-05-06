@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// DELETE /api/admin/events/[id] - Supprimer un événement
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -21,11 +20,10 @@ export async function DELETE(
     });
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: "Événement non trouvé" }, { status: 404 });
+    return NextResponse.json({ error: "Évenement non trouvé" }, { status: 404 });
   }
 }
 
-// PUT /api/admin/events/[id] - Modifier un événement
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -50,6 +48,6 @@ export async function PUT(
     });
     return NextResponse.json(event);
   } catch (error) {
-    return NextResponse.json({ error: "Événement non trouvé" }, { status: 404 });
+    return NextResponse.json({ error: "Évenement non trouvé" }, { status: 404 });
   }
 }

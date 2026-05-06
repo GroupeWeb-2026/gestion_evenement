@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seed des données EventSync...");
 
-  // 1. Créer l'admin
+  // 1. Crée l'admin
   const adminPassword = await bcrypt.hash("admin123", 10);
   const admin = await prisma.user.upsert({
     where: { email: "admin@eventsync.com" },
@@ -20,7 +20,7 @@ async function main() {
   });
   console.log("✅ Admin créé");
 
-  // 2. Créer les salles (rooms)
+  // 2. Crée les salles (rooms)
   const rooms = [
     { name: "Grande Salle" },
     { name: "Salle B" },
@@ -36,16 +36,19 @@ async function main() {
   }
   console.log("✅ Salles créées");
 
-  // 3. Récupérer les salles
-  const grandeSalle = await prisma.room.findUnique({ where: { name: "Grande Salle" } });
+  // 3. Récupère les salles
+  const grandeSalle = await prisma.room.findUnique({
+    where: { name: "Grande Salle" },
+  });
   const salleB = await prisma.room.findUnique({ where: { name: "Salle B" } });
   const amphiC = await prisma.room.findUnique({ where: { name: "Amphi C" } });
 
-  // 4. Créer un événement
+  // 4. Crée un événement
   const event = await prisma.event.create({
     data: {
       title: "DevCon 2026 - Madagascar",
-      description: "La plus grande conférence tech de Madagascar. Deux jours de sessions, workshops et networking.",
+      description:
+        "La plus grande conférence tech de Madagascar. Deux jours de sessions, workshops et networking.",
       dateStart: new Date("2026-05-15T09:00:00Z"),
       dateEnd: new Date("2026-05-16T18:00:00Z"),
       organizerId: admin.id,
@@ -53,7 +56,7 @@ async function main() {
   });
   console.log("✅ Événement créé");
 
-  // 5. Créer les speakers
+  // 5. Crée les speakers
   const speakers = [
     {
       fullName: "Rajaona Andriamanantena",
@@ -82,23 +85,30 @@ async function main() {
   }
   console.log("✅ Speakers créés");
 
-  // 6. Récupérer les speakers
-  const rajaona = await prisma.speaker.findFirst({ where: { fullName: "Rajaona Andriamanantena" } });
-  const mireille = await prisma.speaker.findFirst({ where: { fullName: "Mireille Rasoazanany" } });
-  const hery = await prisma.speaker.findFirst({ where: { fullName: "Hery Rakotomalala" } });
+  // 6. Récupère les speakers
+  const rajaona = await prisma.speaker.findFirst({
+    where: { fullName: "Rajaona Andriamanantena" },
+  });
+  const mireille = await prisma.speaker.findFirst({
+    where: { fullName: "Mireille Rasoazanany" },
+  });
+  const hery = await prisma.speaker.findFirst({
+    where: { fullName: "Hery Rakotomalala" },
+  });
 
-  // 7. Créer les sessions (dont une en cours pour tester le LIVE)
+  // 7. Crée les sessions
   const now = new Date();
   const liveStart = new Date(now);
-  liveStart.setHours(now.getHours() - 1); // commencé il y a 1h
+  liveStart.setHours(now.getHours() - 1);
   const liveEnd = new Date(now);
-  liveEnd.setHours(now.getHours() + 1); // fin dans 1h
+  liveEnd.setHours(now.getHours() + 1);
 
   const sessions = [
     {
       title: "Next.js 15 et Server Components",
-      description: "Découvrez les nouveautés de Next.js 15 et comment optimiser vos apps.",
-      startTime: liveStart, // SESSION LIVE !
+      description:
+        "Découvrez les nouveautés de Next.js 15 et comment optimiser vos apps.",
+      startTime: liveStart,
       endTime: liveEnd,
       capacity: 100,
       eventId: event.id,
@@ -106,7 +116,8 @@ async function main() {
     },
     {
       title: "Prisma ORM - Bonnes pratiques",
-      description: "Apprenez à modéliser vos données et optimiser vos requêtes.",
+      description:
+        "Apprenez à modéliser vos données et optimiser vos requêtes.",
       startTime: new Date("2026-05-15T11:00:00Z"),
       endTime: new Date("2026-05-15T12:30:00Z"),
       capacity: 80,
@@ -140,7 +151,7 @@ async function main() {
   }
   console.log("✅ Sessions créées");
 
-  // 8. Associer les speakers aux sessions
+  // 8. Associe les speakers aux sessions
   const sessionList = await prisma.session.findMany();
 
   // Session 1 (Next.js) -> Rajaona + Hery
@@ -174,7 +185,7 @@ async function main() {
 
   console.log("✅ Speakers associés aux sessions");
 
-  // 9. Ajouter quelques questions de test sur la session LIVE
+  // 9. Ajout des questions de test sur la session LIVE
   await prisma.question.createMany({
     data: [
       {
@@ -184,8 +195,9 @@ async function main() {
         sessionId: sessionList[0].id,
       },
       {
-        content: "Quelle est la différence entre Server Actions et API Routes ?",
-        authorName: null, // anonyme
+        content:
+          "Quelle est la différence entre Server Actions et API Routes ?",
+        authorName: null,
         upvotes: 3,
         sessionId: sessionList[0].id,
       },
@@ -199,9 +211,9 @@ async function main() {
   });
   console.log("✅ Questions de test ajoutées");
 
-  console.log("\n🎉 Seed terminé avec succès !");
-  console.log("📧 Admin: admin@eventsync.com | Mot de passe: admin123");
-  console.log("🔴 Une session LIVE est disponible (Next.js 15)");
+  console.log("\n Seed terminé avec succès !");
+  console.log("Admin: admin@eventsync.com | Mot de passe: admin123");
+  console.log("Une session LIVE est disponible (Next.js 15)");
 }
 
 main()

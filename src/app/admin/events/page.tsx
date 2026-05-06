@@ -22,13 +22,13 @@ function getEventStatus(sessions: { startTime: Date; endTime: Date }[]): { label
     return { label: "Aucune session", color: "bg-gray-400 text-white"};
   }
   
-  // Vérifier s'il y a au moins une session en cours (LIVE)
+  // Vérifie s'il y a au moins une session en cours (LIVE)
   const hasLive = sessions.some(session => now >= session.startTime && now <= session.endTime);
   if (hasLive) {
     return { label: "LIVE", color: "bg-red-500 text-white"};
   }
   
-  // Vérifier s'il y a des sessions à venir (pas encore commencées)
+  // Vérifie s'il y a des sessions à venir (pas encore commencées)
   const hasUpcoming = sessions.some(session => now < session.startTime);
   if (hasUpcoming) {
     return { label: "En cours", color: "bg-blue-500 text-white"};

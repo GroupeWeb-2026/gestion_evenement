@@ -49,7 +49,6 @@ export function EventCard({ event }: { event: EventCardData }) {
   const status = getSessionStatus(event.startTime, event.endTime);
 
   useEffect(() => {
-    // Générer un nombre de likes différent pour chaque événement basé sur son ID unique
     let hash = 0;
     for (let i = 0; i < event.id.length; i++) {
       hash = (hash << 5) - hash + event.id.charCodeAt(i);
@@ -76,14 +75,14 @@ export function EventCard({ event }: { event: EventCardData }) {
 
   return (
     <Link href={`/events/${event.id}`}>
-      <article className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition hover:shadow-lg cursor-pointer h-full flex flex-col w-full min-w-[280px] max-w-[350px] mx-auto cursor-default">
+      <article className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition hover:shadow-lg cursor-pointer h-full flex flex-col w-full min-w-[280px] max-w-[350px] mx-auto">
         <div className="relative aspect-[4/3] overflow-hidden">
           <img
             src={event.imageUrl}
             alt={event.title}
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105 cursor-default"
           />
-          <span className="absolute left-3 top-3 rounded-md bg-black/65 px-2 py-1 text-xs font-medium text-white">
+          <span className="absolute left-3 top-3 rounded-md bg-black/65 px-2 py-1 text-xs font-medium text-white cursor-default">
             {event.dateLabel}
           </span>
           <button
@@ -93,20 +92,20 @@ export function EventCard({ event }: { event: EventCardData }) {
             }}
             className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow"
           >
-            <Pin className="h-4 w-4 text-gray-500 rotate-45" />
+            <Pin className="h-4 w-4 text-gray-500 rotate-45 cursor-pointer" />
           </button>
         </div>
 
         <div className="p-5 flex-1 flex flex-col">
-          <h3 className="line-clamp-2 text-[16px] font-semibold text-gray-900">
+          <h3 className="line-clamp-2 text-[16px] font-semibold text-gray-900 cursor-default">
             {event.title}
           </h3>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-gray-500 cursor-default">
             {event.location}, {event.city}
           </p>
 
           {/* Badge catégorie */}
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex items-center gap-2 cursor-default">
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700">
               <span
                 className="h-1.5 w-1.5 rounded-full"
@@ -122,7 +121,7 @@ export function EventCard({ event }: { event: EventCardData }) {
               {/* Bouton Coeur avec fond */}
               <button
                 onClick={handleLike}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
               >
                 <Heart
                   className={`h-4 w-4 transition-colors ${
@@ -139,7 +138,7 @@ export function EventCard({ event }: { event: EventCardData }) {
               {/* Bouton Message avec fond - affiche le vrai nombre de questions */}
               <button
                 onClick={handleMessage}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
               >
                 <MessageCircle className="h-4 w-4 text-gray-500 hover:text-brand-600 transition-colors" />
                 <span className="text-xs text-gray-600 font-medium">
@@ -150,7 +149,7 @@ export function EventCard({ event }: { event: EventCardData }) {
 
             {/* Badge Statut */}
             <div
-              className={`px-2.5 py-1 rounded-full text-xs font-medium ${status.color}`}
+              className={`px-2.5 py-1 rounded-full cursor-default text-xs font-medium ${status.color}`}
             >
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />

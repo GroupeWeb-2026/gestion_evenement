@@ -25,7 +25,7 @@ export default function NewEventPage() {
         body: JSON.stringify(formData),
       });
       if (!res.ok) throw new Error();
-      toast.success("Événement créé avec succès");
+      toast.success("Évenement crée avec succès");
       router.push("/admin/events");
     } catch {
       toast.error("Erreur lors de la création");
@@ -41,7 +41,7 @@ export default function NewEventPage() {
           <Link href="/admin/events" className="text-brand-600 hover:underline">
             ← Retour
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Créer un événement</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Créer un évenement</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
@@ -89,7 +89,7 @@ export default function NewEventPage() {
             disabled={loading}
             className="w-full btn bg-brand-600 text-white hover:bg-brand-700"
           >
-            {loading ? "Création..." : "Créer l'événement"}
+            {loading ? "Création..." : "Créer l'évenement"}
           </button>
         </form>
       </main>

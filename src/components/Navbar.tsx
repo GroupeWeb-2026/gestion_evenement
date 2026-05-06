@@ -98,7 +98,7 @@ export function Navbar() {
               isActive("/events") ? "text-brand-600" : "text-gray-700 hover:text-brand-600"
             }`}
           >
-            Événements
+            Évenements
           </Link>
           <Link
             ref={favoritesRef}

@@ -10,7 +10,7 @@ import Link from "next/link";
 export default function LoginPage() {
   const router = useRouter();
   const params = useSearchParams();
-  const callbackUrl = params.get("callbackUrl") || "/";  // ← Redirige vers l'accueil
+  const callbackUrl = params.get("callbackUrl") || "/"; 
   const [email, setEmail] = useState("admin@eventsync.com");
   const [password, setPassword] = useState("admin123");
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ export default function LoginPage() {
       return;
     }
     toast.success("Connexion réussie");
-    router.push(callbackUrl);  // ← Redirige vers l'accueil
+    router.push(callbackUrl);  
     router.refresh();
   }
 

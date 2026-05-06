@@ -4,7 +4,7 @@ import { SearchPanel } from "./SearchPanel";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden cursor-default">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
@@ -15,7 +15,7 @@ export function Hero() {
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-24">
         <div className="text-black">
           <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl text-black">
-            Découvrez des événements
+            Découvrez des évenements
             <br /> et participez en direct
           </h1>
           <p className="mt-4 max-w-md text-base text-black">
