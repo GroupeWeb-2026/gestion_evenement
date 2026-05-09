@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Hero } from "@/components/Hero";
 import { EventCard } from "@/components/EventCard";
-import { Filters } from "@/components/Filters";
 import { FeatureBar } from "@/components/FeatureBar";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
@@ -74,16 +73,16 @@ async function getEvents(): Promise<EventCardData[]> {
 function CreateEventCard() {
   return (
     <Link href="/admin/events/new">
-      <div className="group overflow-hidden cursor-default rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm ring-1 ring-gray-200 transition hover:shadow-lg cursor-pointer h-full flex flex-col items-center justify-center min-h-[280px] hover:bg-white/90">
+      <div className="group overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm ring-1 ring-gray-200 transition hover:shadow-lg cursor-pointer h-full flex flex-col items-center justify-center min-h-[280px] hover:bg-white/90">
         <div className="flex flex-col items-center justify-center gap-3 p-6">
           <div className="rounded-full bg-brand-100 p-4 group-hover:bg-brand-200 transition">
             <Plus className="h-8 w-8 text-brand-600" />
           </div>
           <p className="text-sm font-medium text-gray-700">
-            Créer un évenement
+            Créer un événement
           </p>
           <p className="text-xs text-gray-500 text-center">
-            Ajoutez un nouvel évenement
+            Ajoutez un nouvel événement
           </p>
         </div>
       </div>
@@ -101,43 +100,39 @@ export default async function HomePage() {
       <Hero />
 
       <main className="mx-auto mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
-          <section>
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Évenements recommandés
-              </h2>
-              <Link
-                href="/events"
-                className="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors inline-flex items-center gap-1 group"
+        <section className="w-full">
+          <div className="flex items-center justify-between w-full">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Événements recommandés
+            </h2>
+            <Link
+              href="/events"
+              className="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors inline-flex items-center gap-1 group"
+            >
+              Voir tout
+              <svg
+                className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                Voir tout
-                <svg
-                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </Link>
-            </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
+          </div>
 
-            <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 2xl:gap-8">
-              {events.map((e) => (
-                <EventCard key={e.id} event={e} />
-              ))}
-              {isAdmin && <CreateEventCard />}
-            </div>
-          </section>
-
-          <Filters />
-        </div>
+          <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:gap-8">
+            {events.map((e) => (
+              <EventCard key={e.id} event={e} />
+            ))}
+            {isAdmin && <CreateEventCard />}
+          </div>
+        </section>
       </main>
 
       <FeatureBar />

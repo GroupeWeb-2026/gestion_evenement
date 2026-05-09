@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { SearchPanel } from "./SearchPanel";
 
 export function Hero() {
   return (
@@ -31,9 +30,6 @@ export function Hero() {
           </Link>
         </div>
 
-        <div className="lg:justify-self-end lg:self-center w-full max-w-md">
-          <SearchPanel />
-        </div>
       </div>
     </section>
   );

@@ -39,7 +39,7 @@ export default function NewSpeakerPage() {
       <main className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-6">
           <Link href="/admin/speakers" className="text-brand-600 hover:underline">← Retour</Link>
-          <h1 className="text-2xl font-bold text-gray-900">Créer un speaker</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Ajouter un speaker</h1>
         </div>
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
           <div>
@@ -59,7 +59,7 @@ export default function NewSpeakerPage() {
             <input type="url" value={formData.externalLinks} onChange={(e) => setFormData({ ...formData, externalLinks: e.target.value })} className="w-full p-2 border rounded-lg" />
           </div>
           <button type="submit" disabled={loading} className="w-full btn bg-brand-600 text-white">
-            {loading ? "Création..." : "Créer le speaker"}
+            {loading ? "Ajout..." : "Ajouter le speaker"}
           </button>
         </form>
       </main>
