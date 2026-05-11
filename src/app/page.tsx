@@ -133,13 +133,13 @@ function CreateEventCard() {
     <Link href="/admin/events/new">
       <div className="group overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm ring-1 ring-gray-200 transition hover:shadow-lg cursor-pointer h-full flex flex-col items-center justify-center min-h-[280px] hover:bg-white/90">
         <div className="flex flex-col items-center justify-center gap-3 p-6">
-          <div className="rounded-full bg-brand-100 p-4 group-hover:bg-brand-200 transition">
-            <Plus className="h-8 w-8 text-brand-600" />
+          <div className="rounded-full bg-brand-100 p-4 transition-all duration-500 group-hover:bg-brand-200 group-hover:rotate-90">
+            <Plus className="h-8 w-8 text-brand-600 transition-transform duration-500 group-hover:rotate-90" />
           </div>
-          <p className="text-sm font-medium text-gray-700">
+          <p className="text-sm font-medium text-gray-700 group-hover:text-brand-600 transition-colors duration-300">
             Créer un événement
           </p>
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-gray-500 text-center group-hover:text-gray-600 transition-colors duration-300">
             Ajoutez un nouvel événement
           </p>
         </div>
