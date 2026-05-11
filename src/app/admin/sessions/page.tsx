@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 interface Session {
@@ -16,17 +16,20 @@ interface Session {
 }
 
 // Fonction pour déterminer le statut d'une session
-function getSessionStatus(startTime: string, endTime: string): { label: string; color: string} {
+function getSessionStatus(
+  startTime: string,
+  endTime: string,
+): { label: string; color: string } {
   const now = new Date();
   const start = new Date(startTime);
   const end = new Date(endTime);
-  
+
   if (now >= start && now <= end) {
     return { label: "LIVE", color: "bg-red-800 text-white" };
   } else if (now < start) {
-    return { label: "A venir", color: "bg-blue-800 text-white"};
+    return { label: "A venir", color: "bg-blue-800 text-white" };
   } else {
-    return { label: "Terminée", color: "bg-gray-800 text-white"};
+    return { label: "Terminée", color: "bg-gray-800 text-white" };
   }
 }
 
@@ -73,14 +76,29 @@ export default function AdminSessionsPage() {
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-gray-50 p-8">Chargement...</div>;
+  if (loading)
+    return <div className="min-h-screen bg-gray-50 p-8">Chargement...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex items-center gap-4 mb-6">
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-2 text-gray-500 hover:text-brand-600 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Retour au tableau de bord
+          </Link>
+        </div>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Gestion des sessions</h1>
-          <Link href="/admin/sessions/new" className="btn bg-brand-600 text-white">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Gestion des sessions
+          </h1>
+          <Link
+            href="/admin/sessions/new"
+            className="btn bg-brand-600 text-white"
+          >
             <Plus className="h-4 w-4" /> Nouvelle session
           </Link>
         </div>
@@ -101,23 +119,38 @@ export default function AdminSessionsPage() {
               </thead>
               <tbody>
                 {sessions.map((session) => {
-                  const status = getSessionStatus(session.startTime, session.endTime);
+                  const status = getSessionStatus(
+                    session.startTime,
+                    session.endTime,
+                  );
                   return (
                     <tr key={session.id} className="border-b hover:bg-gray-50">
                       <td className="p-4 font-medium">{session.title}</td>
-                      <td className="p-4 text-gray-600">{session.event?.title || "-"}</td>
-                      <td className="p-4 text-gray-600">{session.room?.name || "-"}</td>
-                      <td className="p-4 text-gray-600">{formatDate(session.startTime)}</td>
+                      <td className="p-4 text-gray-600">
+                        {session.event?.title || "-"}
+                      </td>
+                      <td className="p-4 text-gray-600">
+                        {session.room?.name || "-"}
+                      </td>
+                      <td className="p-4 text-gray-600">
+                        {formatDate(session.startTime)}
+                      </td>
                       <td className="p-4 text-gray-600 whitespace-nowrap">
-                        {formatTime(session.startTime)} - {formatTime(session.endTime)}
+                        {formatTime(session.startTime)} -{" "}
+                        {formatTime(session.endTime)}
                       </td>
                       <td className="p-4">
-                        <span className={`${status.color} text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${status.label === "LIVE" ? "animate-pulse" : ""}`}>
+                        <span
+                          className={`${status.color} text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${status.label === "LIVE" ? "animate-pulse" : ""}`}
+                        >
                           <span>{status.icon}</span> {status.label}
                         </span>
                       </td>
                       <td className="p-4">
-                        <button onClick={() => deleteSession(session.id)} className="text-red-600 hover:text-red-800">
+                        <button
+                          onClick={() => deleteSession(session.id)}
+                          className="text-red-600 hover:text-red-800"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </td>
@@ -128,7 +161,7 @@ export default function AdminSessionsPage() {
             </table>
           </div>
         </div>
-        
+
         {sessions.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             Aucune session pour le moment. Créez-en une !

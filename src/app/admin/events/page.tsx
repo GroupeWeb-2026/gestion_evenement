@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, ArrowLeft } from "lucide-react";
 
 async function deleteEvent(id: string) {
   "use server";
@@ -14,28 +14,33 @@ async function deleteEvent(id: string) {
 }
 
 // Fonction pour déterminer le statut d'un événement en fonction de ses sessions
-function getEventStatus(sessions: { startTime: Date; endTime: Date }[]): { label: string; color: string } {
+function getEventStatus(sessions: { startTime: Date; endTime: Date }[]): {
+  label: string;
+  color: string;
+} {
   const now = new Date();
-  
+
   // Si aucune session
   if (sessions.length === 0) {
-    return { label: "Aucune session", color: "bg-gray-400 text-white"};
+    return { label: "Aucune session", color: "bg-gray-400 text-white" };
   }
-  
+
   // Vérifie s'il y a au moins une session en cours (LIVE)
-  const hasLive = sessions.some(session => now >= session.startTime && now <= session.endTime);
+  const hasLive = sessions.some(
+    (session) => now >= session.startTime && now <= session.endTime,
+  );
   if (hasLive) {
-    return { label: "LIVE", color: "bg-red-500 text-white"};
+    return { label: "LIVE", color: "bg-red-500 text-white" };
   }
-  
+
   // Vérifie s'il y a des sessions à venir (pas encore commencées)
-  const hasUpcoming = sessions.some(session => now < session.startTime);
+  const hasUpcoming = sessions.some((session) => now < session.startTime);
   if (hasUpcoming) {
-    return { label: "En cours", color: "bg-blue-500 text-white"};
+    return { label: "En cours", color: "bg-blue-500 text-white" };
   }
-  
+
   // Sinon, toutes les sessions sont terminées
-  return { label: "Terminé", color: "bg-gray-400 text-white"};
+  return { label: "Terminé", color: "bg-gray-400 text-white" };
 }
 
 // Fonction pour formater la date
@@ -52,13 +57,13 @@ export default async function AdminEventsPage() {
   if (!session || session.user.role !== "ADMIN") redirect("/login");
 
   const events = await prisma.event.findMany({
-    include: { 
+    include: {
       sessions: {
         select: {
           startTime: true,
           endTime: true,
-        }
-      } 
+        },
+      },
     },
     orderBy: { dateStart: "desc" },
   });
@@ -66,9 +71,23 @@ export default async function AdminEventsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex items-center gap-4 mb-6">
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-2 text-gray-500 hover:text-brand-600 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Retour au tableau de bord
+          </Link>
+        </div>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Gestion des événements</h1>
-          <Link href="/admin/events/new" className="btn bg-brand-600 text-white hover:bg-brand-700">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Gestion des événements
+          </h1>
+          <Link
+            href="/admin/events/new"
+            className="btn bg-brand-600 text-white hover:bg-brand-700"
+          >
             <Plus className="h-4 w-4" /> Nouvel événement
           </Link>
         </div>
@@ -78,12 +97,24 @@ export default async function AdminEventsPage() {
             <table className="w-full min-w-[900px]">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left p-4 font-medium text-gray-600">Titre</th>
-                  <th className="text-left p-4 font-medium text-gray-600">Date de début</th>
-                  <th className="text-left p-4 font-medium text-gray-600">Date de fin</th>
-                  <th className="text-left p-4 font-medium text-gray-600">Sessions</th>
-                  <th className="text-left p-4 font-medium text-gray-600">Statut</th>
-                  <th className="text-left p-4 font-medium text-gray-600">Actions</th>
+                  <th className="text-left p-4 font-medium text-gray-600">
+                    Titre
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-600">
+                    Date de début
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-600">
+                    Date de fin
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-600">
+                    Sessions
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-600">
+                    Statut
+                  </th>
+                  <th className="text-left p-4 font-medium text-gray-600">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -91,7 +122,9 @@ export default async function AdminEventsPage() {
                   const status = getEventStatus(event.sessions);
                   return (
                     <tr key={event.id} className="border-b hover:bg-gray-50">
-                      <td className="p-4 font-medium text-gray-900">{event.title}</td>
+                      <td className="p-4 font-medium text-gray-900">
+                        {event.title}
+                      </td>
                       <td className="p-4 text-gray-600 whitespace-nowrap">
                         {formatDate(event.dateStart)}
                       </td>
@@ -102,13 +135,18 @@ export default async function AdminEventsPage() {
                         {event.sessions.length}
                       </td>
                       <td className="p-4">
-                        <span className={`${status.color} text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${status.label === "LIVE" ? "animate-pulse" : ""}`}>
+                        <span
+                          className={`${status.color} text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${status.label === "LIVE" ? "animate-pulse" : ""}`}
+                        >
                           <span>{status.icon}</span> {status.label}
                         </span>
                       </td>
                       <td className="p-4">
                         <form action={deleteEvent.bind(null, event.id)}>
-                          <button type="submit" className="text-red-600 hover:text-red-800">
+                          <button
+                            type="submit"
+                            className="text-red-600 hover:text-red-800"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </form>
