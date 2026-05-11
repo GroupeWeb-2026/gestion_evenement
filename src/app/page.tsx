@@ -20,6 +20,7 @@ export type EventCardData = {
   statusLabel?: string;
   statusColor?: string;
   messageCount?: number;
+  likes?: number;
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -30,19 +31,25 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 // Fonction pour déterminer le statut global d'un événement (basé sur toutes ses sessions)
-function getGlobalEventStatus(sessions: { startTime: Date; endTime: Date }[]): { label: string; color: string } {
-  if (!sessions.length) return { label: "À venir", color: "bg-blue-100 text-blue-700" };
-  
+function getGlobalEventStatus(sessions: { startTime: Date; endTime: Date }[]): {
+  label: string;
+  color: string;
+} {
+  if (!sessions.length)
+    return { label: "À venir", color: "bg-blue-100 text-blue-700" };
+
   const now = new Date();
-  
+
   // 1. Y a-t-il une session en cours (LIVE) ?
-  const hasLive = sessions.some(s => now >= s.startTime && now <= s.endTime);
-  if (hasLive) return { label: "LIVE", color: "bg-red-500 text-white animate-pulse" };
-  
+  const hasLive = sessions.some((s) => now >= s.startTime && now <= s.endTime);
+  if (hasLive)
+    return { label: "LIVE", color: "bg-red-500 text-white animate-pulse" };
+
   // 2. Y a-t-il des sessions à venir ?
-  const hasUpcoming = sessions.some(s => now < s.startTime);
-  if (hasUpcoming) return { label: "En cours", color: "bg-blue-100 text-blue-700" };
-  
+  const hasUpcoming = sessions.some((s) => now < s.startTime);
+  if (hasUpcoming)
+    return { label: "En cours", color: "bg-blue-100 text-blue-700" };
+
   // 3. Toutes les sessions sont terminées
   return { label: "Terminée", color: "bg-gray-100 text-gray-500" };
 }
@@ -56,19 +63,43 @@ async function getEvents(): Promise<EventCardData[]> {
         sessions: {
           include: {
             questions: true,
+            speakers: {
+              include: {
+                speaker: true,
+              },
+            },
           },
           orderBy: { startTime: "asc" },
         },
       },
     });
     if (!events.length) return [];
-    
+
     return events.map((e) => {
       const globalStatus = getGlobalEventStatus(e.sessions);
+      const allSpeakers = new Map();
+      e.sessions.forEach((session) => {
+        session.speakers.forEach(({ speaker }) => {
+          if (!allSpeakers.has(speaker.id)) {
+            allSpeakers.set(speaker.id, {
+              id: speaker.id,
+              fullName: speaker.fullName,
+              photo: speaker.photo,
+            });
+          }
+        });
+      });
+
+      // Formatage de la plage de dates
+      const startDate = new Date(e.dateStart);
+      const endDate = new Date(e.dateEnd);
+      const dateRange = `${startDate.toLocaleDateString("fr-FR")} - ${endDate.toLocaleDateString("fr-FR")}`;
+
       return {
         id: e.id,
         title: e.title,
-        imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
+        imageUrl:
+          "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
         location: "Ivandry",
         city: "Antananarivo",
         dateLabel: new Date(e.dateStart)
@@ -78,11 +109,17 @@ async function getEvents(): Promise<EventCardData[]> {
             year: "numeric",
           })
           .toUpperCase(),
+        dateRange: dateRange,
         category: "Conférence",
         categoryColor: CATEGORY_COLORS["Conférence"] ?? "#7c3aed",
         statusLabel: globalStatus.label,
         statusColor: globalStatus.color,
-        messageCount: e.sessions[0]?.questions.length || 0,
+        messageCount: e.sessions.reduce(
+          (total, session) => total + session.questions.length,
+          0,
+        ),
+        likes: e.likes,
+        speakers: Array.from(allSpeakers.values()),
       };
     });
   } catch (error) {

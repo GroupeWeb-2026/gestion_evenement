@@ -7,21 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ============================================
-// MODÈLES PRINCIPAUX - EventSync
-// ============================================
-
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
-  password  String   
+  password  String
   role      Role     @default(ADMIN)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
-  events    Event[]  
+  events     Event[]
+  eventLikes EventLike[]
 }
 
 model Event {
@@ -30,13 +26,14 @@ model Event {
   description String?
   dateStart   DateTime
   dateEnd     DateTime
+  likes       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relations
   organizerId String
   organizer   User     @relation(fields: [organizerId], references: [id])
   sessions    Session[]
+  likesFrom   EventLike[]
 }
 
 model Session {
@@ -45,23 +42,22 @@ model Session {
   description String?
   startTime   DateTime
   endTime     DateTime
-  capacity    Int?      
+  capacity    Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relations
-  eventId     String
-  event       Event    @relation(fields: [eventId], references: [id])
-  roomId      String
-  room        Room     @relation(fields: [roomId], references: [id])
-  speakers    SessionSpeaker[]
-  questions   Question[]
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id])
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id])
+  speakers  SessionSpeaker[]
+  questions Question[]
 }
 
 model Room {
   id        String    @id @default(cuid())
   name      String    @unique
-  isDeleted Boolean   @default(false) 
+  isDeleted Boolean   @default(false)
   sessions  Session[]
 }
 
@@ -71,7 +67,7 @@ model Speaker {
   photo         String?
   bio           String?
   externalLinks String?
-  isDeleted     Boolean   @default(false)  
+  isDeleted     Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -79,10 +75,10 @@ model Speaker {
 }
 
 model SessionSpeaker {
-  sessionId   String
-  speakerId   String
-  session     Session @relation(fields: [sessionId], references: [id])
-  speaker     Speaker @relation(fields: [speakerId], references: [id])
+  sessionId String
+  speakerId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  speaker   Speaker @relation(fields: [speakerId], references: [id], onDelete: Cascade)
 
   @@id([sessionId, speakerId])
 }
@@ -90,16 +86,24 @@ model SessionSpeaker {
 model Question {
   id         String   @id @default(cuid())
   content    String
-  authorName String?   
+  authorName String?
   upvotes    Int      @default(0)
   sessionId  String
-  session    Session  @relation(fields: [sessionId], references: [id])
+  session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
 }
 
-// ============================================
-// ENUM
-// ============================================
+model EventLike {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+}
 
 enum Role {
   ADMIN

@@ -43,7 +43,7 @@ async function main() {
   const salleB = await prisma.room.findUnique({ where: { name: "Salle B" } });
   const amphiC = await prisma.room.findUnique({ where: { name: "Amphi C" } });
 
-  // 4. Crée un événement
+  // 4. Crée un événement (likes à 0 par défaut)
   const event = await prisma.event.create({
     data: {
       title: "DevCon 2026 - Madagascar",
@@ -52,6 +52,7 @@ async function main() {
       dateStart: new Date("2026-05-15T09:00:00Z"),
       dateEnd: new Date("2026-05-16T18:00:00Z"),
       organizerId: admin.id,
+      likes: 0,
     },
   });
   console.log("✅ Événement créé");
@@ -211,9 +212,9 @@ async function main() {
   });
   console.log("✅ Questions de test ajoutées");
 
-  console.log("\n Seed terminé avec succès !");
-  console.log("Admin: admin@eventsync.com | Mot de passe: admin123");
-  console.log("Une session LIVE est disponible (Next.js 15)");
+  console.log("\n✅ Seed terminé avec succès !");
+  console.log("📧 Admin: admin@eventsync.com | Mot de passe: admin123");
+  console.log("🔴 Une session LIVE est disponible (Next.js 15)");
 }
 
 main()
