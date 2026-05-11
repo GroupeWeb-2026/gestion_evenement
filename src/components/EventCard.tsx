@@ -3,6 +3,7 @@
 import { Pin, Heart, MessageCircle, Clock, User, Calendar } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export type EventCardData = {
   id: string;
@@ -25,11 +26,12 @@ export type EventCardData = {
 export function EventCard({ event }: { event: EventCardData }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(event.likes || 0);
-  const [isMsgLiked, setIsMsgLiked] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   const displaySpeakers = event.speakers?.slice(0, 3) || [];
   const remainingCount = (event.speakers?.length || 0) - 3;
 
+  // Récupérer l'état du like et du favori depuis localStorage
   useEffect(() => {
     const likedEvents = JSON.parse(localStorage.getItem("likedEvents") || "{}");
     setIsLiked(likedEvents[event.id] || false);
@@ -40,10 +42,15 @@ export function EventCard({ event }: { event: EventCardData }) {
     } else {
       setLikesCount(event.likes || 0);
     }
+
+    // Récupérer l'état du favori
+    const favorites = JSON.parse(localStorage.getItem("favoriteEvents") || "[]");
+    setIsFavorited(favorites.includes(event.id));
   }, [event.id, event.likes]);
 
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const newLikedState = !isLiked;
     const increment = newLikedState ? 1 : -1;
     
@@ -72,9 +79,28 @@ export function EventCard({ event }: { event: EventCardData }) {
     }
   };
 
+  const handleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const favorites = JSON.parse(localStorage.getItem("favoriteEvents") || "[]");
+    let newFavorites;
+    
+    if (isFavorited) {
+      newFavorites = favorites.filter((id: string) => id !== event.id);
+      toast.info(`"${event.title}" retiré des favoris`);
+    } else {
+      newFavorites = [...favorites, event.id];
+      toast.success(`"${event.title}" ajouté aux favoris`);
+    }
+    
+    localStorage.setItem("favoriteEvents", JSON.stringify(newFavorites));
+    setIsFavorited(!isFavorited);
+  };
+
   const handleMessage = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsMsgLiked(!isMsgLiked);
+    e.stopPropagation();
     alert("Fonctionnalité de messagerie à venir");
   };
 
@@ -91,13 +117,10 @@ export function EventCard({ event }: { event: EventCardData }) {
             {event.dateLabel}
           </span>
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              alert("Fonctionnalité à venir");
-            }}
-            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow"
+            onClick={handleFavorite}
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow hover:bg-white transition-colors cursor-pointer z-10"
           >
-            <Pin className="h-4 w-4 text-gray-500 rotate-45 cursor-pointer" />
+            <Pin className={`h-4 w-4 transition-colors rotate-45 ${isFavorited ? "fill-yellow-500 text-yellow-500" : "text-gray-500 hover:text-yellow-500"}`} />
           </button>
         </div>
 
@@ -109,7 +132,6 @@ export function EventCard({ event }: { event: EventCardData }) {
             {event.location}, {event.city}
           </p>
 
-          {/* Date range */}
           {event.dateRange && (
             <div className="mt-1 flex items-center gap-1 text-xs text-gray-400 cursor-default">
               <Calendar className="h-3 w-3" />
@@ -117,7 +139,6 @@ export function EventCard({ event }: { event: EventCardData }) {
             </div>
           )}
 
-          {/* Badge catégorie */}
           <div className="mt-3 flex items-center gap-2 cursor-default">
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700">
               <span
@@ -128,7 +149,6 @@ export function EventCard({ event }: { event: EventCardData }) {
             </span>
           </div>
 
-          {/* Liste des intervenants (speakers) */}
           {displaySpeakers.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-1.5">
               {displaySpeakers.map((speaker) => (
@@ -156,7 +176,6 @@ export function EventCard({ event }: { event: EventCardData }) {
             </div>
           )}
 
-          {/* Ligne des boutons et badge statut */}
           <div className="mt-4 flex items-center justify-between border-t pt-3">
             <div className="flex items-center gap-3">
               <button

@@ -21,3 +21,84 @@ body {
   color: var(--foreground);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
+
+/* Style personnalisé pour les checkboxes en forme de cercle (sélection multiple) */
+input.custom-checkbox-circle {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 18px !important;
+  height: 18px !important;
+  border: 2px solid #d1d5db !important;
+  border-radius: 50% !important;
+  background-color: white !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+input.custom-checkbox-circle:checked {
+  border-color: #6d28d9 !important;
+  background-color: #6d28d9 !important;
+}
+
+input.custom-checkbox-circle:checked::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background-color: white !important;
+}
+
+input.custom-checkbox-circle:hover {
+  border-color: #6d28d9 !important;
+}
+
+/* Annuler les styles DaisyUI pour nos checkboxes */
+input.custom-checkbox-circle:focus,
+input.custom-checkbox-circle:focus-visible,
+input.custom-checkbox-circle:active {
+  box-shadow: none !important;
+  outline: none !important;
+  ring: none !important;
+}
+
+/* Style personnalisé pour les radios en forme de cercle */
+.custom-radio-circle {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 18px !important;
+  height: 18px !important;
+  border: 2px solid #d1d5db !important;
+  border-radius: 50% !important;
+  background-color: white !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  cursor: pointer !important;
+}
+
+.custom-radio-circle:checked {
+  border-color: #6d28d9 !important;
+  background-color: #6d28d9 !important;
+}
+
+.custom-radio-circle:checked::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background-color: white !important;
+}
+
+.custom-radio-circle:hover {
+  border-color: #6d28d9 !important;
+}

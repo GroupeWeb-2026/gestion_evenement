@@ -1,18 +1,30 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Upload, Link as LinkIcon, X } from "lucide-react";
+import { Upload, X } from "lucide-react";
 
-export default function NewSpeakerPage() {
+interface Speaker {
+  id: string;
+  fullName: string;
+  photo: string | null;
+  bio: string | null;
+  externalLinks: string | null;
+}
+
+export default function EditSpeakerPage() {
   const router = useRouter();
+  const params = useParams();
+  const speakerId = params.id as string;
+  
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  
   const [formData, setFormData] = useState({
     fullName: "",
     photo: "",
@@ -20,33 +32,51 @@ export default function NewSpeakerPage() {
     externalLinks: "",
   });
 
+  useEffect(() => {
+    const fetchSpeaker = async () => {
+      const res = await fetch(`/api/admin/speakers/${speakerId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setFormData({
+          fullName: data.fullName,
+          photo: data.photo || "",
+          bio: data.bio || "",
+          externalLinks: data.externalLinks || "",
+        });
+        if (data.photo) setImagePreview(data.photo);
+      }
+      setInitialLoading(false);
+    };
+    fetchSpeaker();
+  }, [speakerId]);
+
   const handleFileUpload = async (file: File) => {
     if (!file.type.startsWith("image/")) {
       toast.error("Veuillez sélectionner une image");
       return false;
     }
-
+    
     if (file.size > 5 * 1024 * 1024) {
       toast.error("L'image ne doit pas dépasser 5MB");
       return false;
     }
-
+    
     const previewUrl = URL.createObjectURL(file);
     setImagePreview(previewUrl);
-
+    
     setUploading(true);
     const uploadFormData = new FormData();
     uploadFormData.append("file", file);
-
+    
     try {
       const res = await fetch("/api/upload", {
         method: "POST",
         body: uploadFormData,
       });
-
+      
       if (res.ok) {
         const data = await res.json();
-        setFormData((prev) => ({ ...prev, photo: data.url }));
+        setFormData(prev => ({ ...prev, photo: data.url }));
         toast.success("Image téléchargée avec succès");
         return true;
       } else {
@@ -56,7 +86,6 @@ export default function NewSpeakerPage() {
         return false;
       }
     } catch (error) {
-      console.error("Erreur upload:", error);
       toast.error("Erreur lors du téléchargement");
       setImagePreview(null);
       return false;
@@ -66,7 +95,6 @@ export default function NewSpeakerPage() {
   };
 
   const handleIconClick = () => {
-    // Déclencher le sélecteur de fichier quand on clique sur l'icône lien
     fileInputRef.current?.click();
   };
 
@@ -81,59 +109,56 @@ export default function NewSpeakerPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/speakers", {
-        method: "POST",
+      const res = await fetch(`/api/admin/speakers/${speakerId}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
       if (!res.ok) throw new Error();
-      toast.success("Speaker ajouté avec succès");
+      toast.success("Speaker modifié avec succès");
       router.push("/admin/speakers");
     } catch {
-      toast.error("Erreur lors de l'ajout");
+      toast.error("Erreur lors de la modification");
     } finally {
       setLoading(false);
     }
   };
 
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <main className="max-w-2xl mx-auto px-4 py-8">
+          <p className="text-gray-500">Chargement...</p>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-6">
-          <Link
-            href="/admin/speakers"
-            className="text-brand-600 hover:underline"
-          >
+          <Link href="/admin/speakers" className="text-brand-600 hover:underline">
             ← Retour
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Ajouter un speaker
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900">Modifier le speaker</h1>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-xl shadow-sm p-6 space-y-4"
-        >
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Nom complet *
-            </label>
+            <label className="block text-sm font-medium mb-1">Nom complet *</label>
             <input
               type="text"
               required
               value={formData.fullName}
-              onChange={(e) =>
-                setFormData({ ...formData, fullName: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
               className="w-full p-2 border rounded-lg"
             />
           </div>
-
+          
           <div>
             <label className="block text-sm font-medium mb-1">Photo</label>
-
-            {/* Input file caché */}
+            
             <input
               type="file"
               ref={fileInputRef}
@@ -141,8 +166,7 @@ export default function NewSpeakerPage() {
               onChange={handleFileSelect}
               className="hidden"
             />
-
-            {/* Aperçu */}
+            
             {imagePreview && (
               <div className="mt-2 mb-3">
                 <img
@@ -162,8 +186,7 @@ export default function NewSpeakerPage() {
                 </button>
               </div>
             )}
-
-            {/* Input URL avec icône lien cliquable pour upload */}
+            
             <div className="relative">
               <input
                 type="url"
@@ -175,53 +198,50 @@ export default function NewSpeakerPage() {
                   }
                 }}
                 placeholder="URL de l'image ou cliquez sur l'icône pour télécharger"
-                className="w-full p-2 pr-12 border rounded-lg"
+                className="w-full p-2 pr-10 border rounded-lg"
               />
               <button
                 type="button"
                 onClick={handleIconClick}
                 disabled={uploading}
-                className="absolute right-1 top-1/2 -translate-y-1/2 p-3 rounded-md text-black bg-brand-50 hover:text-brand-600 hover:bg-brand-50 transition-all duration-300 disabled:opacity-50 cursor-pointer group"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-600 transition-colors disabled:opacity-50"
                 title="Télécharger une image depuis votre appareil"
               >
-                <LinkIcon className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
+                <Upload className="h-4 w-4" />
               </button>
             </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Entrez une URL d'image ou cliquez sur l'icône 📤 pour télécharger une image depuis votre appareil
+            </p>
           </div>
-
+          
           <div>
             <label className="block text-sm font-medium mb-1">Bio</label>
             <textarea
               rows={4}
               value={formData.bio}
-              onChange={(e) =>
-                setFormData({ ...formData, bio: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
               className="w-full p-2 border rounded-lg"
             />
           </div>
-
+          
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Liens externes
-            </label>
+            <label className="block text-sm font-medium mb-1">Liens externes</label>
             <input
               type="url"
               value={formData.externalLinks}
-              onChange={(e) =>
-                setFormData({ ...formData, externalLinks: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, externalLinks: e.target.value })}
               placeholder="https://..."
               className="w-full p-2 border rounded-lg"
             />
           </div>
-
+          
           <button
             type="submit"
             disabled={loading || uploading}
             className="w-full btn bg-brand-600 text-white disabled:opacity-50"
           >
-            {loading ? "Ajout..." : "Ajouter le speaker"}
+            {loading ? "Modification..." : "Modifier le speaker"}
           </button>
         </form>
       </main>

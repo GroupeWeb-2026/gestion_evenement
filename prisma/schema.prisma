@@ -26,6 +26,9 @@ model Event {
   description String?
   dateStart   DateTime
   dateEnd     DateTime
+  location    String   @default("Ivandry")
+  city        String   @default("Antananarivo")
+  imageUrl    String   @default("https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800")
   likes       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

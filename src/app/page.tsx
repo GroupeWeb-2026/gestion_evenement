@@ -14,6 +14,7 @@ export type EventCardData = {
   location: string;
   city: string;
   dateLabel: string;
+  dateRange?: string;
   category: string;
   categoryColor?: string;
   initialLiked?: boolean;
@@ -21,6 +22,7 @@ export type EventCardData = {
   statusColor?: string;
   messageCount?: number;
   likes?: number;
+  speakers?: { id: string; fullName: string; photo?: string | null }[];
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -77,6 +79,8 @@ async function getEvents(): Promise<EventCardData[]> {
 
     return events.map((e) => {
       const globalStatus = getGlobalEventStatus(e.sessions);
+
+      // Récupérer tous les speakers uniques de l'événement
       const allSpeakers = new Map();
       e.sessions.forEach((session) => {
         session.speakers.forEach(({ speaker }) => {
@@ -90,25 +94,49 @@ async function getEvents(): Promise<EventCardData[]> {
         });
       });
 
-      // Formatage de la plage de dates
-      const startDate = new Date(e.dateStart);
-      const endDate = new Date(e.dateEnd);
-      const dateRange = `${startDate.toLocaleDateString("fr-FR")} - ${endDate.toLocaleDateString("fr-FR")}`;
+      // Calculer la date de début (première session) et date de fin (dernière session)
+      let sessionStartDate = null;
+      let sessionEndDate = null;
+
+      if (e.sessions.length > 0) {
+        const firstSession = e.sessions[0];
+        const lastSession = e.sessions[e.sessions.length - 1];
+        sessionStartDate = new Date(firstSession.startTime);
+        sessionEndDate = new Date(lastSession.endTime);
+      }
+
+      // Date label pour le badge (jour de la première session)
+      const dateLabel = sessionStartDate
+        ? sessionStartDate
+            .toLocaleDateString("fr-FR", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
+            .toUpperCase()
+        : new Date(e.dateStart)
+            .toLocaleDateString("fr-FR", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
+            .toUpperCase();
+
+      // Plage de dates basée sur les sessions
+      const dateRange =
+        sessionStartDate && sessionEndDate
+          ? `${sessionStartDate.toLocaleDateString("fr-FR")} - ${sessionEndDate.toLocaleDateString("fr-FR")}`
+          : `${new Date(e.dateStart).toLocaleDateString("fr-FR")} - ${new Date(e.dateEnd).toLocaleDateString("fr-FR")}`;
 
       return {
         id: e.id,
         title: e.title,
         imageUrl:
-          "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
-        location: "Ivandry",
-        city: "Antananarivo",
-        dateLabel: new Date(e.dateStart)
-          .toLocaleDateString("fr-FR", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })
-          .toUpperCase(),
+          e.imageUrl ||
+          "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800", // 🔥 MODIFIÉ
+        location: e.location,
+        city: e.city,
+        dateLabel: dateLabel,
         dateRange: dateRange,
         category: "Conférence",
         categoryColor: CATEGORY_COLORS["Conférence"] ?? "#7c3aed",

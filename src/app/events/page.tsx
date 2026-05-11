@@ -12,6 +12,7 @@ export type EventCardData = {
   location: string;
   city: string;
   dateLabel: string;
+  dateRange?: string;
   category: string;
   categoryColor?: string;
   initialLiked?: boolean;
@@ -19,6 +20,7 @@ export type EventCardData = {
   statusColor?: string;
   messageCount?: number;
   likes?: number;
+  speakers?: { id: string; fullName: string; photo?: string | null }[];
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -29,19 +31,25 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 // Fonction pour déterminer le statut global d'un événement (basé sur toutes ses sessions)
-function getGlobalEventStatus(sessions: { startTime: Date; endTime: Date }[]): { label: string; color: string } {
-  if (!sessions.length) return { label: "À venir", color: "bg-blue-100 text-blue-700" };
-  
+function getGlobalEventStatus(sessions: { startTime: Date; endTime: Date }[]): {
+  label: string;
+  color: string;
+} {
+  if (!sessions.length)
+    return { label: "À venir", color: "bg-blue-100 text-blue-700" };
+
   const now = new Date();
-  
+
   // 1. Y a-t-il une session en cours (LIVE) ?
-  const hasLive = sessions.some(s => now >= s.startTime && now <= s.endTime);
-  if (hasLive) return { label: "LIVE", color: "bg-red-500 text-white animate-pulse" };
-  
+  const hasLive = sessions.some((s) => now >= s.startTime && now <= s.endTime);
+  if (hasLive)
+    return { label: "LIVE", color: "bg-red-500 text-white animate-pulse" };
+
   // 2. Y a-t-il des sessions à venir ?
-  const hasUpcoming = sessions.some(s => now < s.startTime);
-  if (hasUpcoming) return { label: "En cours", color: "bg-blue-100 text-blue-700" };
-  
+  const hasUpcoming = sessions.some((s) => now < s.startTime);
+  if (hasUpcoming)
+    return { label: "En cours", color: "bg-blue-100 text-blue-700" };
+
   // 3. Toutes les sessions sont terminées
   return { label: "Terminée", color: "bg-gray-100 text-gray-500" };
 }
@@ -54,34 +62,89 @@ async function getEvents(): Promise<EventCardData[]> {
         sessions: {
           include: {
             questions: true,
+            speakers: {
+              include: {
+                speaker: true,
+              },
+            },
           },
           orderBy: { startTime: "asc" },
         },
       },
     });
     if (!events.length) return [];
-    
+
     return events.map((e) => {
       const globalStatus = getGlobalEventStatus(e.sessions);
+
+      // Récupérer tous les speakers uniques de l'événement
+      const allSpeakers = new Map();
+      e.sessions.forEach((session) => {
+        session.speakers.forEach(({ speaker }) => {
+          if (!allSpeakers.has(speaker.id)) {
+            allSpeakers.set(speaker.id, {
+              id: speaker.id,
+              fullName: speaker.fullName,
+              photo: speaker.photo,
+            });
+          }
+        });
+      });
+
+      // Calculer la date de début (première session) et date de fin (dernière session)
+      let sessionStartDate = null;
+      let sessionEndDate = null;
+
+      if (e.sessions.length > 0) {
+        const firstSession = e.sessions[0];
+        const lastSession = e.sessions[e.sessions.length - 1];
+        sessionStartDate = new Date(firstSession.startTime);
+        sessionEndDate = new Date(lastSession.endTime);
+      }
+
+      // Date label pour le badge (jour de la première session)
+      const dateLabel = sessionStartDate
+        ? sessionStartDate
+            .toLocaleDateString("fr-FR", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
+            .toUpperCase()
+        : new Date(e.dateStart)
+            .toLocaleDateString("fr-FR", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
+            .toUpperCase();
+
+      // Plage de dates basée sur les sessions
+      const dateRange =
+        sessionStartDate && sessionEndDate
+          ? `${sessionStartDate.toLocaleDateString("fr-FR")} - ${sessionEndDate.toLocaleDateString("fr-FR")}`
+          : `${new Date(e.dateStart).toLocaleDateString("fr-FR")} - ${new Date(e.dateEnd).toLocaleDateString("fr-FR")}`;
+
       return {
         id: e.id,
         title: e.title,
-        imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
-        location: "Ivandry",
-        city: "Antananarivo",
-        dateLabel: new Date(e.dateStart)
-          .toLocaleDateString("fr-FR", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })
-          .toUpperCase(),
+        imageUrl:
+          e.imageUrl ||
+          "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800", // 🔥 MODIFIÉ
+        location: e.location,
+        city: e.city,
+        dateLabel: dateLabel,
+        dateRange: dateRange,
         category: "Conférence",
         categoryColor: CATEGORY_COLORS["Conférence"] ?? "#7c3aed",
         statusLabel: globalStatus.label,
         statusColor: globalStatus.color,
-        messageCount: e.sessions.reduce((total, session) => total + session.questions.length, 0),
-        likes: e.likes,  // 🔥 IMPORTANT : récupère les likes depuis la base
+        messageCount: e.sessions.reduce(
+          (total, session) => total + session.questions.length,
+          0,
+        ),
+        likes: e.likes,
+        speakers: Array.from(allSpeakers.values()),
       };
     });
   } catch (error) {
@@ -95,13 +158,13 @@ function CreateEventCard() {
     <Link href="/admin/events/new">
       <div className="group overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm ring-1 ring-gray-200 transition hover:shadow-lg cursor-pointer h-full flex flex-col items-center justify-center min-h-[280px] hover:bg-white/90">
         <div className="flex flex-col items-center justify-center gap-3 p-6">
-          <div className="rounded-full bg-brand-100 p-4 group-hover:bg-brand-200 transition">
-            <Plus className="h-8 w-8 text-brand-600" />
+          <div className="rounded-full bg-brand-100 p-4 transition-all duration-500 group-hover:bg-brand-200 group-hover:rotate-90">
+            <Plus className="h-8 w-8 text-brand-600 transition-transform duration-500 group-hover:rotate-90" />
           </div>
-          <p className="text-sm font-medium text-gray-700">
+          <p className="text-sm font-medium text-gray-700 group-hover:text-brand-600 transition-colors duration-300">
             Créer un événement
           </p>
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-gray-500 text-center group-hover:text-gray-600 transition-colors duration-300">
             Ajoutez un nouvel événement
           </p>
         </div>
@@ -118,11 +181,23 @@ export default async function EventsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3 mb-6">
-          <Calendar className="h-8 w-8 text-brand-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Tous les événements</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Calendar className="h-8 w-8 text-brand-600" />
+            <h1 className="text-2xl font-bold text-gray-900">
+              Tous les événements
+            </h1>
+          </div>
+          {isAdmin && (
+            <Link
+              href="/admin/events/new"
+              className="btn bg-brand-600 text-white hover:bg-brand-700"
+            >
+              <Plus className="h-4 w-4" /> Nouvel événement
+            </Link>
+          )}
         </div>
-        
+
         <p className="text-gray-600 mb-8">
           Découvrez tous les événements disponibles et participez en direct
         </p>

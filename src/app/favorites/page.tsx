@@ -2,41 +2,62 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Star, Clock, MapPin } from "lucide-react";
+import { EventCard } from "@/components/EventCard";
+import { Star } from "lucide-react";
 
-interface Session {
+interface Event {
   id: string;
   title: string;
-  description: string | null;
-  startTime: Date;
-  endTime: Date;
-  room: { name: string };
-  event: { title: string; id: string };
+  imageUrl: string;
+  location: string;
+  city: string;
+  dateLabel: string;
+  category: string;
+  categoryColor?: string;
+  statusLabel?: string;
+  statusColor?: string;
+  messageCount?: number;
+  likes?: number;
+  speakers?: { id: string; fullName: string; photo?: string | null }[];
+  dateRange?: string;
 }
 
 export default function FavoritesPage() {
-  const [favoriteSessions, setFavoriteSessions] = useState<Session[]>([]);
+  const [favoriteEvents, setFavoriteEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFavorites = async () => {
-      const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+      // 🔥 Vérifier la clé localStorage
+      const favorites = JSON.parse(localStorage.getItem("favoriteEvents") || "[]");
+      console.log("Favoris trouvés:", favorites);
+      
       if (favorites.length === 0) {
-        setFavoriteSessions([]);
+        setFavoriteEvents([]);
         setLoading(false);
         return;
       }
-      const res = await fetch("/api/favorites/batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionIds: favorites }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setFavoriteSessions(data);
+      
+      try {
+        const res = await fetch("/api/favorites/batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ eventIds: favorites }), // 🔥 Doit correspondre à l'API
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          console.log("Événements reçus:", data);
+          setFavoriteEvents(data);
+        } else {
+          console.error("Erreur API:", res.status);
+        }
+      } catch (error) {
+        console.error("Erreur fetch:", error);
       }
       setLoading(false);
     };
+    
     fetchFavorites();
   }, []);
 
@@ -53,37 +74,22 @@ export default function FavoritesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Mes sessions favorites</h1>
-        <p className="text-gray-600 mb-6">Sessions que vous avez ajoutées à vos favoris</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Mes événements favoris</h1>
+        <p className="text-gray-600 mb-6">Événements que vous avez épinglés</p>
 
-        {favoriteSessions.length === 0 && (
+        {favoriteEvents.length === 0 && (
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
             <Star className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">Aucune session favorite</p>
+            <p className="text-gray-500">Aucun événement favori</p>
             <Link href="/events" className="text-brand-600 hover:underline text-sm mt-2 inline-block">
               Parcourir les événements →
             </Link>
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-4">
-          {favoriteSessions.map((session) => (
-            <Link key={session.id} href={`/sessions/${session.id}`}>
-              <div className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition border border-gray-100">
-                <h2 className="text-lg font-semibold text-gray-900">{session.title}</h2>
-                <p className="text-sm text-gray-500 mt-1">{session.event.title}</p>
-                <div className="flex flex-wrap gap-4 mt-3 text-xs text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {new Date(session.startTime).toLocaleDateString("fr-FR")} à {new Date(session.startTime).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {session.room.name}
-                  </div>
-                </div>
-              </div>
-            </Link>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {favoriteEvents.map((event) => (
+            <EventCard key={event.id} event={event} />
           ))}
         </div>
       </main>
