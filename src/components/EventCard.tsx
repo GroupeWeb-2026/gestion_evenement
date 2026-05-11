@@ -14,39 +14,14 @@ export type EventCardData = {
   category: string;
   categoryColor?: string;
   initialLiked?: boolean;
-  startTime?: Date;
-  endTime?: Date;
+  statusLabel?: string;
+  statusColor?: string;
   messageCount?: number;
 };
-
-// Fonction pour déterminer le statut d'une session
-function getSessionStatus(
-  startTime?: Date,
-  endTime?: Date,
-): { label: string; color: string } {
-  if (!startTime || !endTime)
-    return { label: "À venir", color: "bg-blue-100 text-blue-700" };
-
-  const now = new Date();
-  const start = new Date(startTime);
-  const end = new Date(endTime);
-
-  if (now >= start && now <= end) {
-    return { label: "LIVE", color: "bg-red-500 text-white animate-pulse" };
-  } else if (now < start) {
-    return { label: "À venir", color: "bg-blue-100 text-blue-700" };
-  } else {
-    return {
-      label: "Terminée",
-      color: "bg-gray-100 text-gray-500 cursor-default",
-    };
-  }
-}
 
 export function EventCard({ event }: { event: EventCardData }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
-  const status = getSessionStatus(event.startTime, event.endTime);
 
   useEffect(() => {
     let hash = 0;
@@ -149,11 +124,11 @@ export function EventCard({ event }: { event: EventCardData }) {
 
             {/* Badge Statut */}
             <div
-              className={`px-2.5 py-1 rounded-full cursor-default text-xs font-medium ${status.color}`}
+              className={`px-2.5 py-1 rounded-full cursor-default text-xs font-medium ${event.statusColor || "bg-blue-100 text-blue-700"}`}
             >
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                <span>{status.label}</span>
+                <span>{event.statusLabel || "À venir"}</span>
               </div>
             </div>
           </div>
