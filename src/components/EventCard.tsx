@@ -35,7 +35,7 @@ export function EventCard({ event }: { event: EventCardData }) {
   useEffect(() => {
     const likedEvents = JSON.parse(localStorage.getItem("likedEvents") || "{}");
     setIsLiked(likedEvents[event.id] || false);
-    
+
     const storedLikes = JSON.parse(localStorage.getItem("eventLikes") || "{}");
     if (storedLikes[event.id] !== undefined) {
       setLikesCount(storedLikes[event.id]);
@@ -44,7 +44,9 @@ export function EventCard({ event }: { event: EventCardData }) {
     }
 
     // Récupérer l'état du favori
-    const favorites = JSON.parse(localStorage.getItem("favoriteEvents") || "[]");
+    const favorites = JSON.parse(
+      localStorage.getItem("favoriteEvents") || "[]",
+    );
     setIsFavorited(favorites.includes(event.id));
   }, [event.id, event.likes]);
 
@@ -53,19 +55,19 @@ export function EventCard({ event }: { event: EventCardData }) {
     e.stopPropagation();
     const newLikedState = !isLiked;
     const increment = newLikedState ? 1 : -1;
-    
+
     const newLikesCount = likesCount + increment;
     setLikesCount(newLikesCount);
     setIsLiked(newLikedState);
-    
+
     const likedEvents = JSON.parse(localStorage.getItem("likedEvents") || "{}");
     likedEvents[event.id] = newLikedState;
     localStorage.setItem("likedEvents", JSON.stringify(likedEvents));
-    
+
     const storedLikes = JSON.parse(localStorage.getItem("eventLikes") || "{}");
     storedLikes[event.id] = newLikesCount;
     localStorage.setItem("eventLikes", JSON.stringify(storedLikes));
-    
+
     try {
       await fetch(`/api/events/${event.id}/like`, {
         method: "POST",
@@ -82,10 +84,12 @@ export function EventCard({ event }: { event: EventCardData }) {
   const handleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    const favorites = JSON.parse(localStorage.getItem("favoriteEvents") || "[]");
+
+    const favorites = JSON.parse(
+      localStorage.getItem("favoriteEvents") || "[]",
+    );
     let newFavorites;
-    
+
     if (isFavorited) {
       newFavorites = favorites.filter((id: string) => id !== event.id);
       toast.info(`"${event.title}" retiré des favoris`);
@@ -93,7 +97,7 @@ export function EventCard({ event }: { event: EventCardData }) {
       newFavorites = [...favorites, event.id];
       toast.success(`"${event.title}" ajouté aux favoris`);
     }
-    
+
     localStorage.setItem("favoriteEvents", JSON.stringify(newFavorites));
     setIsFavorited(!isFavorited);
   };
@@ -109,7 +113,10 @@ export function EventCard({ event }: { event: EventCardData }) {
       <article className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition hover:shadow-lg cursor-pointer h-full flex flex-col w-full min-w-[280px] max-w-[350px] mx-auto">
         <div className="relative aspect-[4/3] overflow-hidden">
           <img
-            src={event.imageUrl}
+            src={
+              event.imageUrl ||
+              "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800"
+            }
             alt={event.title}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105 cursor-default"
           />
@@ -120,7 +127,9 @@ export function EventCard({ event }: { event: EventCardData }) {
             onClick={handleFavorite}
             className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow hover:bg-white transition-colors cursor-pointer z-10"
           >
-            <Pin className={`h-4 w-4 transition-colors rotate-45 ${isFavorited ? "fill-yellow-500 text-yellow-500" : "text-gray-500 hover:text-yellow-500"}`} />
+            <Pin
+              className={`h-4 w-4 transition-colors rotate-45 ${isFavorited ? "fill-yellow-500 text-yellow-500" : "text-gray-500 hover:text-yellow-500"}`}
+            />
           </button>
         </div>
 
@@ -184,14 +193,18 @@ export function EventCard({ event }: { event: EventCardData }) {
               >
                 <Heart
                   className={`h-4 w-4 transition-colors ${
-                    isLiked 
-                      ? "fill-red-500 text-red-500" 
+                    isLiked
+                      ? "fill-red-500 text-red-500"
                       : "text-gray-500 group-hover/like:text-red-500 group-hover/like:fill-red-500"
                   }`}
                 />
-                <span className={`text-xs font-medium transition-colors ${
-                  isLiked ? "text-red-500" : "text-gray-600 group-hover/like:text-red-500"
-                }`}>
+                <span
+                  className={`text-xs font-medium transition-colors ${
+                    isLiked
+                      ? "text-red-500"
+                      : "text-gray-600 group-hover/like:text-red-500"
+                  }`}
+                >
                   {likesCount}
                 </span>
               </button>

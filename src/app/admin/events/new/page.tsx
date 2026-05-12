@@ -257,7 +257,7 @@ export default function NewEventPage() {
             {/* Image */}
             <div>
               <label className="block text-sm font-medium mb-1">
-                Image de l'événement
+                Image de l'événement (optionnelle)
               </label>
               <input
                 type="file"
@@ -289,13 +289,13 @@ export default function NewEventPage() {
 
               <div className="relative">
                 <input
-                  type="url"
+                  type="text"
                   value={formData.imageUrl}
                   onChange={(e) => {
                     setFormData({ ...formData, imageUrl: e.target.value });
                     if (e.target.value) setImagePreview(e.target.value);
                   }}
-                  placeholder="URL de l'image ou cliquez sur l'icône pour télécharger"
+                  placeholder="URL de l'image (optionnel)"
                   className="w-full p-2 pr-12 border rounded-lg"
                 />
                 <button
@@ -309,6 +309,7 @@ export default function NewEventPage() {
               </div>
               <p className="text-xs text-gray-500 mt-1">
                 Entrez une URL d'image ou cliquez sur l'icône pour télécharger
+                (optionnel)
               </p>
             </div>
 

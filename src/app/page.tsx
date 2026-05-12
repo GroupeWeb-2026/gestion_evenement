@@ -80,7 +80,6 @@ async function getEvents(): Promise<EventCardData[]> {
     return events.map((e) => {
       const globalStatus = getGlobalEventStatus(e.sessions);
 
-      // Récupérer tous les speakers uniques de l'événement
       const allSpeakers = new Map();
       e.sessions.forEach((session) => {
         session.speakers.forEach(({ speaker }) => {
@@ -94,7 +93,6 @@ async function getEvents(): Promise<EventCardData[]> {
         });
       });
 
-      // Calculer la date de début (première session) et date de fin (dernière session)
       let sessionStartDate = null;
       let sessionEndDate = null;
 
@@ -105,7 +103,6 @@ async function getEvents(): Promise<EventCardData[]> {
         sessionEndDate = new Date(lastSession.endTime);
       }
 
-      // Date label pour le badge (jour de la première session)
       const dateLabel = sessionStartDate
         ? sessionStartDate
             .toLocaleDateString("fr-FR", {
@@ -122,7 +119,6 @@ async function getEvents(): Promise<EventCardData[]> {
             })
             .toUpperCase();
 
-      // Plage de dates basée sur les sessions
       const dateRange =
         sessionStartDate && sessionEndDate
           ? `${sessionStartDate.toLocaleDateString("fr-FR")} - ${sessionEndDate.toLocaleDateString("fr-FR")}`
@@ -131,9 +127,7 @@ async function getEvents(): Promise<EventCardData[]> {
       return {
         id: e.id,
         title: e.title,
-        imageUrl:
-          e.imageUrl ||
-          "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800", // 🔥 MODIFIÉ
+        imageUrl: e.imageUrl || "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800",
         location: e.location,
         city: e.city,
         dateLabel: dateLabel,
