@@ -1,7 +1,9 @@
 "use client";
 
-import { Heart } from "lucide-react";
+import { Heart, CalendarPlus } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export type EventCardData = {
   id: string;
@@ -16,6 +18,32 @@ export type EventCardData = {
 };
 
 export function EventCard({ event }: { event: EventCardData }) {
+  const [loading, setLoading] = useState(false);
+  const [inscrit, setInscrit] = useState(false);
+
+  async function handleInscription(e: React.MouseEvent) {
+    e.preventDefault();
+    setLoading(true);
+    const res = await fetch("/api/registration", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ eventId: event.id }),
+    });
+    setLoading(false);
+    if (res.status === 401) {
+      toast.error("Connectez-vous pour vous inscrire");
+      return;
+    }
+    if (res.status === 400) {
+      toast.error("Vous êtes déjà inscrit");
+      return;
+    }
+    if (res.ok) {
+      setInscrit(true);
+      toast.success("Inscription réussie !");
+    }
+  }
+
   return (
     <Link href={`/events/${event.id}`}>
       <article className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition hover:shadow-lg cursor-pointer">
@@ -43,7 +71,7 @@ export function EventCard({ event }: { event: EventCardData }) {
           <p className="mt-1 text-xs text-gray-500">
             {event.location}, {event.city}
           </p>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700">
               <span
                 className="h-1.5 w-1.5 rounded-full"
@@ -51,6 +79,18 @@ export function EventCard({ event }: { event: EventCardData }) {
               />
               {event.category}
             </span>
+            <button
+              onClick={handleInscription}
+              disabled={loading || inscrit}
+              className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+                inscrit
+                  ? "bg-green-100 text-green-700"
+                  : "bg-brand-600 text-white hover:bg-brand-700"
+              }`}
+            >
+              <CalendarPlus className="h-3 w-3" />
+              {loading ? "..." : inscrit ? "Inscrit ✓" : "S'inscrire"}
+            </button>
           </div>
         </div>
       </article>

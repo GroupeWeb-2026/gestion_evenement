@@ -2,16 +2,15 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isLive } from "@/lib/isLive";
 import Link from "next/link";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar } from "lucide-react";
+import { RegisterButton } from "@/components/RegisterButton";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-// Fonction pour déterminer le statut d'une session
 function getSessionStatus(startTime: Date, endTime: Date): { label: string; color: string } {
   const now = new Date();
-  
   if (now >= startTime && now <= endTime) {
     return { label: "LIVE", color: "bg-red-500 text-white" };
   } else if (now < startTime) {
@@ -43,7 +42,6 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   if (!event) notFound();
 
-  // Grouper les sessions par horaire
   const sessionsByTime = new Map();
   for (const session of event.sessions) {
     const timeKey = session.startTime.toISOString();
@@ -56,6 +54,7 @@ export default async function EventDetailPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        
         {/* En-tête */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-3">{event.title}</h1>
@@ -66,6 +65,9 @@ export default async function EventDetailPage({ params }: PageProps) {
               {new Date(event.dateStart).toLocaleDateString("fr-FR")} -{" "}
               {new Date(event.dateEnd).toLocaleDateString("fr-FR")}
             </span>
+          </div>
+          <div className="mt-4">
+            <RegisterButton eventId={event.id} />
           </div>
         </div>
 
