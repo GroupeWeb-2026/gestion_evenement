@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { Bell, LogOut, Search } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { useState } from "react";
 
 const links = [
   { href: "/", label: "Accueil" },
@@ -13,18 +14,23 @@ const links = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
-  
-  // Ne pas montrer l'interface admin sur la page de login
   const isLoginPage = pathname === "/login";
-  
-  // Afficher l'interface admin si connecté ET pas sur la page de login
   const showAdminUI = isLoggedIn && !isLoginPage;
+  const [search, setSearch] = useState("");
 
   const initials = session?.user?.name
     ? session.user.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
     : "?";
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (search.trim()) {
+      router.push(`/events?search=${encodeURIComponent(search.trim())}`);
+    }
+  }
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-gray-200 bg-white/90 backdrop-blur">
@@ -34,14 +40,16 @@ export function Navbar() {
         </Link>
 
         {/* Barre de recherche */}
-        <div className="relative hidden flex-1 max-w-md md:block">
+        <form onSubmit={handleSearch} className="relative hidden flex-1 max-w-md md:block">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Rechercher un événement"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Rechercher un événement..."
             className="input input-bordered h-10 w-full rounded-full border-gray-200 bg-gray-50 pl-9 text-sm focus:bg-white"
           />
-        </div>
+        </form>
 
         {/* Navigation links */}
         <nav className="hidden items-center gap-6 md:flex">
@@ -60,7 +68,6 @@ export function Navbar() {
               </Link>
             );
           })}
-          {/* Lien Admin visible uniquement quand connecté (sur toutes les pages sauf login) */}
           {showAdminUI && (
             <Link href="/admin" className="relative text-sm font-medium text-gray-700 hover:text-brand-600 transition">
               Admin
@@ -74,7 +81,6 @@ export function Navbar() {
           </button>
 
           {showAdminUI ? (
-            // Interface connecté : nom + déconnexion
             <>
               <div className="flex items-center gap-1.5 rounded-full bg-gray-100 py-1 pl-1 pr-2">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
@@ -93,7 +99,6 @@ export function Navbar() {
               </button>
             </>
           ) : (
-            // Bouton Connexion (visible sur toutes les pages quand non connecté)
             <Link href="/login" className="btn btn-sm border-0 bg-brand-600 text-white hover:bg-brand-700">
               Connexion
             </Link>
