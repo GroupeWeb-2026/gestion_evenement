@@ -30,7 +30,15 @@ export default function LoginPage() {
       return;
     }
     toast.success("Connexion réussie");
-    router.push(callbackUrl);
+
+    const userRes = await fetch("/api/auth/me");
+    const user = await userRes.json();
+
+    if (user.role === "ADMIN") {
+      window.location.href = "http://localhost:5173";
+    } else {
+      router.push(callbackUrl);
+    }
     router.refresh();
   }
 
