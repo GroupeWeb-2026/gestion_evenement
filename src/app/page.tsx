@@ -39,9 +39,9 @@ async function getEvents(): Promise<EventCardData[]> {
     return events.map((e) => ({
       id: e.id,
       title: e.title,
-      imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
-      location: "Ivandry",
-      city: "Antananarivo",
+      imageUrl: e.imageUrl || "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgGRi4OB4Th0FjYm6Xky36a1KNag90YhCiTPjg6FoiROEfhyphenhyphenYtsvsnysQu0e9o4BDtiN9644uukvYrPKB7aa8P-oAM_zZaBrmwv0lGrzbXwIM1DziJO3RibWQBqJZtX0rTblHXB3zWl1Ltz8YR53NzQes6qF1ine-9uO1W64RymzAK8oT5CMW6y4XKlWKLw/s1200/U%20MAGIS%20CHAMPION%202022%20DU%20SMATCHIN.jpg",
+      location: e.location || "Non précisé",
+      city: e.city || "Non précisé",
       dateLabel: new Date(e.dateStart)
         .toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })
         .toUpperCase(),

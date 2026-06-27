@@ -34,6 +34,10 @@ model Event {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   registrations Registration[]
+  location  String?
+  city      String?
+  imageUrl  String?
+  category  String?
 
   // Relations
   organizerId String

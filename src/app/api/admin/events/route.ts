@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    const { title, description, dateStart, dateEnd, organizerId } = await request.json();
+    const { title, description, dateStart, dateEnd, location, city, imageUrl, category, organizerId } = await request.json();
     
     if (!title || !dateStart || !dateEnd) {
       return NextResponse.json({ error: "Champs manquants" }, { status: 400 });
@@ -15,6 +15,10 @@ export async function POST(request: Request) {
         description: description || "",
         dateStart: new Date(dateStart),
         dateEnd: new Date(dateEnd),
+        location: location || null,
+        city: city || null,
+        imageUrl: imageUrl || null,
+        category: category || "Conférence",
         organizerId: organizerId || "cmqsgjtiv0000s8kokddmnn3f",
       },
     });
@@ -33,3 +37,4 @@ export async function GET() {
   });
   return NextResponse.json(events);
 }
+
