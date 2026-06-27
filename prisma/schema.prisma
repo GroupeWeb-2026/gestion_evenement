@@ -19,7 +19,7 @@ model User {
   role      Role     @default(ADMIN)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  favorites Favorite[]
   // Relations
   events    Event[]  
   registrations Registration[]
@@ -38,7 +38,7 @@ model Event {
   city      String?
   imageUrl  String?
   category  String?
-
+  favorites Favorite[]
   // Relations
   organizerId String
   organizer   User     @relation(fields: [organizerId], references: [id])
@@ -54,7 +54,7 @@ model Session {
   capacity    Int?      
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
+  favorites Favorite[]
   // Relations
   eventId     String
   event       Event    @relation(fields: [eventId], references: [id])
@@ -122,4 +122,18 @@ model Registration {
   event     Event    @relation(fields: [eventId], references: [id])
 
   @@unique([userId, eventId])
+}
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String?
+  sessionId String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  event     Event?   @relation(fields: [eventId], references: [id])
+  session   Session? @relation(fields: [sessionId], references: [id])
+
+  @@unique([userId, eventId])
+  @@unique([userId, sessionId])
 }

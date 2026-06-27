@@ -11,29 +11,51 @@ interface FavoriteButtonProps {
 
 export function FavoriteButton({ sessionId, sessionTitle }: FavoriteButtonProps) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-    setIsFavorite(favorites.includes(sessionId));
+    async function checkFavorite() {
+      const res = await fetch("/api/favorite");
+      if (res.ok) {
+        const favorites = await res.json();
+        setIsFavorite(favorites.some((f: any) => f.sessionId === sessionId));
+      }
+    }
+    checkFavorite();
   }, [sessionId]);
 
-  const toggleFavorite = () => {
-    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-    let newFavorites;
+  async function toggleFavorite() {
+    setLoading(true);
     if (isFavorite) {
-      newFavorites = favorites.filter((id: string) => id !== sessionId);
-      toast.info(`"${sessionTitle}" retiré des favoris`);
+      const res = await fetch("/api/favorite", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      });
+      if (res.ok) {
+        setIsFavorite(false);
+        toast.info(`"${sessionTitle}" retiré des favoris`);
+      }
     } else {
-      newFavorites = [...favorites, sessionId];
-      toast.success(`"${sessionTitle}" ajouté aux favoris`);
+      const res = await fetch("/api/favorite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      });
+      if (res.status === 401) {
+        toast.error("Connectez-vous pour ajouter aux favoris");
+      } else if (res.ok) {
+        setIsFavorite(true);
+        toast.success(`"${sessionTitle}" ajouté aux favoris !`);
+      }
     }
-    localStorage.setItem("favorites", JSON.stringify(newFavorites));
-    setIsFavorite(!isFavorite);
-  };
+    setLoading(false);
+  }
 
   return (
     <button
       onClick={toggleFavorite}
+      disabled={loading}
       className={`flex items-center gap-2 px-3 py-2 rounded-lg transition ${
         isFavorite ? "bg-yellow-50 text-yellow-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
       }`}

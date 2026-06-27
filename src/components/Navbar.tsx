@@ -82,14 +82,15 @@ export function Navbar() {
 
           {showAdminUI ? (
             <>
-              <div className="flex items-center gap-1.5 rounded-full bg-gray-100 py-1 pl-1 pr-2">
+              <Link href="/profile" className="flex items-center gap-1.5 rounded-full bg-gray-100 py-1 pl-1 pr-2 hover:bg-gray-200 transition">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
                   {initials}
                 </div>
                 <span className="hidden text-xs font-medium text-gray-700 sm:inline">
                   {session.user.name}
                 </span>
-              </div>
+              </Link>  
+              
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="btn btn-ghost btn-sm"
