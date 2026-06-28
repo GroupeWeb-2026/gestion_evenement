@@ -10,6 +10,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Événement sportif": "#3b82f6",
 };
 
+
 async function getAllEvents(search?: string) {
   const events = await prisma.event.findMany({
     where: search ? {

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { isLive } from "@/lib/isLive";
 import { QuestionForm } from "@/components/questions/QuestionForm";
 import { QuestionList } from "@/components/questions/QuestionList";
-import { FavoriteButton } from "@/components/FavoriteButton";
+import { FavoriteButton } from "@/components/FavoriteEventButton";
 import { Calendar, Clock, MapPin, User, Users } from "lucide-react";
 import Link from "next/link";
 
