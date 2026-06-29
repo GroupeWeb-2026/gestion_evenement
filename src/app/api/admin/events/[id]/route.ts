@@ -73,9 +73,22 @@ export async function GET(
 ) {
   const { id } = await params;
   const event = await prisma.event.findUnique({
-    where: { id },
-    include: { sessions: true },
-  });
+  where: { id },
+  include: {
+    organizer: true,
+    sessions: {
+      include: {
+        room: true,
+        questions: true,
+        speakers: {
+          include: {
+            speaker: true,
+          },
+        },
+      },
+    },
+  },
+});
   if (!event) return NextResponse.json({ error: "Non trouvé" }, { status: 404 });
   return NextResponse.json(event);
 }
