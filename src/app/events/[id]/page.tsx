@@ -8,7 +8,6 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-// Fonction pour déterminer le statut d'une session
 function getSessionStatus(startTime: Date, endTime: Date): { label: string; color: string } {
   const now = new Date();
   

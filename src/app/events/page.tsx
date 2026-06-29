@@ -24,7 +24,6 @@ async function getAllEvents(search?: string) {
     orderBy: { dateStart: "asc" },
   });
 
-  // 🔥 DEBUG AJOUTÉ ICI
   console.log("EVENTS FRONT =", events);
 
   return events.map((e) => ({
