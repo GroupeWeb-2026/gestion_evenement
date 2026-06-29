@@ -6,6 +6,7 @@ import { QuestionList } from "@/components/questions/QuestionList";
 import { FavoriteEventButton } from "@/components/FavoriteEventButton";
 import { Calendar, Clock, MapPin, User, Users } from "lucide-react";
 import Link from "next/link";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -61,6 +62,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
               <p className="text-gray-600 mb-4">{session.description}</p>
             </div>
             <FavoriteEventButton eventId={session.eventId} />
+            <FavoriteButton sessionId={session.id} sessionTitle={session.title} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-500">
