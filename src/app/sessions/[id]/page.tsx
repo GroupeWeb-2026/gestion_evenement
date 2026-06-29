@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { isLive } from "@/lib/isLive";
 import { QuestionForm } from "@/components/questions/QuestionForm";
 import { QuestionList } from "@/components/questions/QuestionList";
-import { FavoriteButton } from "@/components/FavoriteEventButton";
+import { FavoriteEventButton } from "@/components/FavoriteEventButton";
 import { Calendar, Clock, MapPin, User, Users } from "lucide-react";
 import Link from "next/link";
 
@@ -60,7 +60,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
               </div>
               <p className="text-gray-600 mb-4">{session.description}</p>
             </div>
-            <FavoriteButton sessionId={session.id} sessionTitle={session.title} />
+            <FavoriteEventButton eventId={session.eventId} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-500">

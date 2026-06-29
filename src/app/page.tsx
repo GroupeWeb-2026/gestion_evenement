@@ -45,8 +45,8 @@ async function getEvents(): Promise<EventCardData[]> {
       dateLabel: new Date(e.dateStart)
         .toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })
         .toUpperCase(),
-      category: "Conférence",
-      categoryColor: CATEGORY_COLORS["Conférence"] ?? "#7c3aed",
+      category: e.category || "Conférence",
+      categoryColor: CATEGORY_COLORS[e.category || "Conférence"] ?? "#7c3aed",
     }));
   } catch (error) {
     console.error("Erreur getEvents:", error);

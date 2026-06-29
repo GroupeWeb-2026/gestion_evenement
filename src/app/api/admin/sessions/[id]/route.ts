@@ -15,6 +15,10 @@ export async function DELETE(
     await prisma.question.deleteMany({
       where: { sessionId: id },
     });
+
+    await prisma.favorite.deleteMany({
+      where: { sessionId: id },
+    });
     
     await prisma.session.delete({ where: { id } });
     
